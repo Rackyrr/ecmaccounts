@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+    {% block styles %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='datatables.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% endblock %}
+<body>
+{% block content %}
+    <div class="container mt-3 full-width">
+        <div class="row mt-1">
+            <div class="col-md-12">
+                <!-- Résultat du CSV -->
+                <div class="card w-100">
+                    <div class="card-header">
+                        Comptes
+                    </div>
+                    <div class="card-body scrollable-body">
+                        <!-- Affichez le résultat du CSV ici -->
+                        <table id="myTable" class="table">
+                            <thead class="thead-dark">
+                                <tr>
+                                    {% for key in accounts[0].keys() %}
+                                        <th>{{ key }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in accounts %}
+                                    <tr>
+                                        {% for value in row.values() %}
+                                            <td>{{ value }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+</body>
+
+{% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='datatables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='tableau.js') }}"></script>
+{% endblock %}

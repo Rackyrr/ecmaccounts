@@ -1,0 +1,12 @@
+from urllib.parse import quote_plus
+
+
+class Config(object):
+    # Configuration de la base de données PostgreSQL
+    SQLALCHEMY_DATABASE_URI = 'postgresql://user:pwd@lhost:port/db_name'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    LDAP_SERVER = 'ldaps://ldap.example.net'
+    LDAP_USER = "cn=user,ou=users,dc=example,dc=fr"
+    LDAP_PASSWORD = "password"
+    LDAP_SEARCH_BASE = 'ou=user,dc=example,dc=fr'
+    UPLOAD_FOLDER = 'app/uploads'

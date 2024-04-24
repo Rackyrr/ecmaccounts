@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+    {% block styles %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='datatables.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% endblock %}
+<body>
+
+{% block content %}
+<div class="container mt-3 full-width">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    Fichier CSV
+                </div>
+                <div class="card-body">
+                    <div class="card-title">
+                        <p><strong>Nom du fichier :</strong> {{ filename }}</p>
+                    </div>
+                    <a href="{{ url_for('csvMailActivity.upload') }}" class="btn btn-primary">Télécharger un autre fichier CSV</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-1">
+        <div class="col-md-12">
+            <!-- Résultat du CSV -->
+            <div class="card w-100">
+                <div class="card-header">
+                    Comptes
+                </div>
+                <div class="card-body scrollable-body">
+                    <!-- Affichez le résultat du CSV ici -->
+                    <table id="myTable" class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                {% for key in donnees[0].keys() %}
+                                    {% if loop.index < loop.length %}
+                                        <th>{{ key }}</th>
+                                    {% endif %}
+                                {% endfor %}
+                                    <th>Bloquer/Débloquer</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in donnees %}
+                                <tr>
+                                    {% for value in row.values() %}
+                                        {% if loop.index < loop.length %}
+                                            <td>{{ value }}</td>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <td>
+                                        {% if row['locked'] == False %}
+                                            <a href="{{ url_for('accountAction.lock', login=row['Login']) }}" title="Bloquer utilisateur">
+                                                <img src="{{ url_for('static', filename='unlock-fill.svg') }}" alt="Icon cadena ouvert">
+                                            </a>
+                                        {% else %}
+                                            <a href="{{ url_for('accountAction.unlock', login=row['Login']) }}" title="Débloquer utilisateur">
+                                                <img src="{{ url_for('static', filename='lock-fill.svg') }}" alt="Icon cadena fermé">
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='datatables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='tableau.js') }}"></script>
+{% endblock %}
