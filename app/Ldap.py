@@ -42,21 +42,32 @@ class Ldap:
                 return None
             return conn.response[0]['attributes']['mailLocalAddress'][0]
 
-    def getAllUserMail(self):
+    def getAllUsersBasicInfo(self):
         """
-        Recuperer l'email de tous les utilisateurs
-        :return:
+        Recuperer les informations de base de tous les utilisateurs
+        (login, email, groupe)
+        :return: Dictionnaire
         """
         with self.connection as conn:
             conn.search(current_app.config['LDAP_SEARCH_BASE'], '(objectclass=supannPerson)',
-                        attributes=['uid', 'mailLocalAddress'], search_scope='SUBTREE')
+                        attributes=['uid', 'mailLocalAddress', 'supannAffectation'], search_scope='SUBTREE')
             AccountsMail = {}
             for entry in conn.response:
                 email = entry['attributes'].get('mailLocalAddress', '')
+                groupe = entry['attributes'].get('supannAffectation', '')
                 if email:
-                    AccountsMail[entry['attributes']['uid'][0]] = email[0]
+                    email = email[0]
                 else:
-                    AccountsMail[entry['attributes']['uid'][0]] = 'Non renseigné'
+                    email = 'Non renseigné'
+                if groupe:
+                    if len(groupe) > 1:
+                        groupe = ", ".join(groupe)
+                    else:
+                        groupe = groupe[0]
+                else:
+                    groupe = 'Non renseigné'
+                AccountsMail[entry['attributes']['uid'][0]] = {'email': email, 'groupe': groupe}
+            print(AccountsMail)
             return AccountsMail
 
     def getUserByLogin(self, login):
@@ -73,3 +84,13 @@ class Ldap:
                 return None
             return {"login": conn.response[0]['attributes']['uid'][0],
                     "email": conn.response[0]['attributes']['mailLocalAddress'][0]}
+
+    def seeUserExample(self):
+        """
+        Exemple de recherche d'un utilisateur pour voir les attributs
+        :return:
+        """
+        with self.connection as conn:
+            conn.search(current_app.config['LDAP_SEARCH_BASE'], '(objectclass=supannPerson)',
+                        attributes=['*'], search_scope='SUBTREE')
+            return str(conn.response[0])

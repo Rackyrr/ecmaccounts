@@ -51,7 +51,7 @@ def mailActivity():
         # Lire le fichier CSV téléversé et traiter ses données
         with open(os.path.join(upload_folder, file.filename), newline='', encoding='utf-8') as csv_file:
             lecteur_csv = csv.reader(csv_file)
-            emailAccounts = ldap.getAllUserMail()
+            infoAccounts = ldap.getAllUsersBasicInfo()
             for ligne in lecteur_csv:
                 ligneTab = ligne[0].split(';')
                 # Vérifier si le compte existe dans la base de données et s'il n'est pas supprimé
@@ -63,10 +63,14 @@ def mailActivity():
                     dureeInactif = dateActivite - timedelta(days=int(ligneTab[2]))
                     nbJourInactif = (datetime.now().date() - dureeInactif).days
                     # Déterminer l'email test de l'utilisateur à partir de LDAP
-                    email = emailAccounts.get(ligneTab[1])
-                    if email is None:
+                    info = infoAccounts.get(ligneTab[1])
+                    if info is not None:
+                        email = info['email']
+                        groupe = info['groupe']
+                    else:
                         email = 'Non renseigné'
-                    donnees.append({'Login': ligneTab[1], 'Email': email, "Groupe": ligneTab[3],
+                        groupe = 'Non renseigné'
+                    donnees.append({'Login': ligneTab[1], 'Email': email, "Groupe": groupe,
                                     'Dernière activité': dureeInactif, 'Nombre de jours inactif': nbJourInactif,
                                     'locked': account.locked if account is not None else False})
                 else:

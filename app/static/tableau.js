@@ -1,6 +1,8 @@
 let table = new DataTable('#myTable', {
+    //Selection des lignes possibles
     select: true,
     responsive: true,
+    //Organisation visuelle du tableau
     dom:
         "<'row'<'col-sm-12'Q>>" + // SearchBuilder
         "<'row'<'col-sm-12'tr>>" + // Tableau pleine largeur
@@ -10,12 +12,17 @@ let table = new DataTable('#myTable', {
         {
             text: 'Supprimer',
             action: function (e, dt, node, config, cb) {
+                // On récupère les lignes sélectionnées dans le tableau (en bleu)
                 const selectedRows = dt.rows({ selected: true });
+                // Pour supprimer, il faut au moins une ligne sélectionnée
                 if (selectedRows.count() > 0) {
-                    //Affiche chaque ligne sélectionné dans la console
+                    let selectedLogin = [];
+                    // On récupère le login de chaque ligne sélectionnée
                     selectedRows.every(function () {
-                        console.log("Supprime " +this.data()[0]);
+                        selectedLogin.push(this.data()[0]);
                     });
+                    $('#deleteListLogin').val(selectedLogin.join(',')); // On met les logins dans le champ caché du form
+                    $('#deleteModal').modal('show'); // On affiche la modal pour obtenir la raison et confirmer
                 } else {
                     alert('Sélectionnez au moins une ligne');
                 }

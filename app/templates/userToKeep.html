@@ -14,25 +14,7 @@
                         Comptes
                     </div>
                     <div class="card-body scrollable-body">
-                        <!-- Affichez le résultat du CSV ici -->
-                        <table id="myTable" class="table">
-                            <thead class="thead-dark">
-                                <tr>
-                                    {% for key in accounts[0].keys() %}
-                                        <th>{{ key }}</th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in accounts %}
-                                    <tr>
-                                        {% for value in row.values() %}
-                                            <td>{{ value }}</td>
-                                        {% endfor %}
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                        {% include 'dataTable.html' %}
                     </div>
                 </div>
             </div>

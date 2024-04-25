@@ -14,7 +14,7 @@ def userToKeep():
     """
     ldap = Ldap()
     accountsReadModel = []
-    emailAccounts = ldap.getAllUserMail()
+    emailAccounts = ldap.getAllUsersBasicInfo()
     accounts = Account.query.filter_by(to_keep=True).all()
     for account in accounts:
         storageTime = (AccountStorageTime.query.filter_by(account_id=account.id)
@@ -23,6 +23,7 @@ def userToKeep():
         if accountMail is None:
             accountMail = 'Non renseigné'
         accountsReadModel.append({'Login': account.login, 'Email': accountMail, 'Depuis': storageTime.since,
-                                  'Jusqu\'à': storageTime.until, 'Raison': storageTime.reason})
+                                  'Jusqu\'à': storageTime.until, 'Raison': storageTime.reason,
+                                  'locked': account.locked if account is not None else False})
 
-    return render_template('userToKeep.html', accounts=accountsReadModel)
+    return render_template('userToKeep.html', donnees=accountsReadModel)

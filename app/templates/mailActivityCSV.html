@@ -24,47 +24,14 @@
     </div>
     <div class="row mt-1">
         <div class="col-md-12">
-            <!-- Résultat du CSV -->
+            <!-- Résultat du CSV
+            Card Bootstrap-->
             <div class="card w-100">
                 <div class="card-header">
                     Comptes
                 </div>
-                <div class="card-body scrollable-body">
-                    <!-- Affichez le résultat du CSV ici -->
-                    <table id="myTable" class="table">
-                        <thead class="thead-dark">
-                            <tr>
-                                {% for key in donnees[0].keys() %}
-                                    {% if loop.index < loop.length %}
-                                        <th>{{ key }}</th>
-                                    {% endif %}
-                                {% endfor %}
-                                    <th>Bloquer/Débloquer</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for row in donnees %}
-                                <tr>
-                                    {% for value in row.values() %}
-                                        {% if loop.index < loop.length %}
-                                            <td>{{ value }}</td>
-                                        {% endif %}
-                                    {% endfor %}
-                                    <td>
-                                        {% if row['locked'] == False %}
-                                            <a href="{{ url_for('accountAction.lock', login=row['Login']) }}" title="Bloquer utilisateur">
-                                                <img src="{{ url_for('static', filename='unlock-fill.svg') }}" alt="Icon cadena ouvert">
-                                            </a>
-                                        {% else %}
-                                            <a href="{{ url_for('accountAction.unlock', login=row['Login']) }}" title="Débloquer utilisateur">
-                                                <img src="{{ url_for('static', filename='lock-fill.svg') }}" alt="Icon cadena fermé">
-                                            </a>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="card-body">
+                    {% include 'dataTable.html' %}
                 </div>
             </div>
         </div>
