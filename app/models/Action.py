@@ -2,7 +2,7 @@ from app.extensions import db
 
 
 class Action(db.Model):
-    action_id = db.Column(db.Integer, primary_key=True)
+    action_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     label = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.String(128))
 

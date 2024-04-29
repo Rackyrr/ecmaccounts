@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import redirect, request, url_for, abort
+from flask import redirect, request, url_for, abort, render_template
 
 from app import db
 from app.Ldap import Ldap
@@ -8,8 +8,6 @@ from app.accountAction import bp
 from app.models.Account import Account
 from app.models.History import History
 from app.models.Action import Action
-
-# Todo : change delete route to post method
 
 
 @bp.route('/delete', methods=['POST'])
@@ -25,11 +23,11 @@ def delete():
         account = Account.query.filter_by(login=login).first()
         if account is None:
             ldap = Ldap()
-            userTemp = ldap.getUserByLogin(login)
-            if userTemp is None:
+            accountLdap = ldap.getUserByLogin(login)
+            if accountLdap is None:
                 return abort(404, 'Login non existant, Suppression impossible. Login : ' + login)
             else:
-                account = Account(login=userTemp['login'], email=userTemp['email'])
+                account = Account(login=accountLdap['login'], email=accountLdap['email'])
                 db.session.add(account)
                 db.session.commit()
         account.deleted = True
@@ -51,11 +49,11 @@ def lock():
     account = Account.query.filter_by(login=login).first()
     if account is None:
         ldap = Ldap()
-        userTemp = ldap.getUserByLogin(login)
-        if userTemp is None:
+        accountLdap = ldap.getUserByLogin(login)
+        if accountLdap is None:
             return abort(404, 'Login non existant, Blocage impossible. Login : ' + login)
         else:
-            account = Account(login=userTemp['login'], email=userTemp['email'])
+            account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
             db.session.add(account)
             db.session.commit()
     account.locked = True
@@ -77,11 +75,11 @@ def unlock():
     account = Account.query.filter_by(login=login).first()
     if account is None:
         ldap = Ldap()
-        userTemp = ldap.getUserByLogin(login)
-        if userTemp is None:
+        accountLdap = ldap.getUserByLogin(login)
+        if accountLdap is None:
             return abort(404, 'Login non existant, Déblocage impossible. Login : ' + login)
         else:
-            account = Account(login=userTemp['login'], email=userTemp['email'])
+            account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
             db.session.add(account)
             db.session.commit()
     account.locked = False
@@ -90,3 +88,30 @@ def unlock():
     db.session.commit()
 
     return redirect(request.referrer or url_for('main.index'))
+
+
+@bp.route('<string:login>/details')
+def details(login):
+    """
+    Afficher les détails d'un compte utilisateur.
+    :param login: login de l'utilisateur
+    :return: Template html
+    """
+    account = Account.query.filter_by(login=login).first()
+    ldap = Ldap()
+    accountLdap = ldap.getUserByLogin(login)
+    if account is None:
+        if accountLdap is None:
+            return abort(404, 'Login non existant, Détails impossible. Login : ' + login)
+        else:
+            account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
+            db.session.add(account)
+            db.session.commit()
+    history = History.query.filter_by(account_id=account.id).all()
+    historyReadModel = []
+    for h in history:
+        historyReadModel.append({'Date': h.date_action,
+                                 'Action': Action.query.filter_by(action_id=h.action_id).first().label,
+                                 'Raison': h.reason})
+    return render_template('accountDetails.html', user=accountLdap, donnees=historyReadModel,
+                           locked=account.locked, deleted=account.deleted)

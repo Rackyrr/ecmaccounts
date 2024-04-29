@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_migrate import Migrate
 
 from app.extensions import db
 from config import Config
@@ -15,6 +16,7 @@ def create_app(config_class=Config):
 
     # Flask extensions
     db.init_app(app)
+    migrate = Migrate(app, db, compare_type=True)
 
     # Blueprint registration
 
@@ -23,8 +25,8 @@ def create_app(config_class=Config):
     app.register_blueprint(main_bp)
 
     # CsvMailActivity blueprint
-    from app.csvMailActivity import bp as csvMailActivity_bp
-    app.register_blueprint(csvMailActivity_bp, url_prefix='/activity')
+    from app.activity import bp as activity_bp
+    app.register_blueprint(activity_bp, url_prefix='/activity')
 
     # UserToKeep blueprint
     from app.userToKeep import bp as userToKeep_bp
@@ -33,6 +35,10 @@ def create_app(config_class=Config):
     # AccountAction blueprint
     from app.accountAction import bp as accountAction_bp
     app.register_blueprint(accountAction_bp, url_prefix='/account')
+
+    # AllAccounts blueprint
+    from app.allAccounts import bp as allAccounts_bp
+    app.register_blueprint(allAccounts_bp, url_prefix='/all_accounts')
 
     return app
 

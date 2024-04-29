@@ -6,9 +6,12 @@ Import css :
 Import js :
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ url_for('static', filename='datatables.min.js') }}"></script>
-<script src="{{ url_for('static', filename='tableau.js') }}"></script>
+<script src="{{ url_for('static', filename='dataTable_user.js') }}"></script>
 -->
 
+{% block styles %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='datatables.min.css') }}">
+{% endblock %}
 
 <!-- Affichez les données
 DataTable commence ici-->
@@ -26,6 +29,9 @@ DataTable commence ici-->
             {% endfor %}
             {% if 'locked' in donnees[0] %}
                 <th>Bloquer/Débloquer</th>
+            {% endif %}
+            {% if lookOption == True %}
+                <th>Plus de détails</th>
             {% endif %}
         </tr>
     </thead>
@@ -54,6 +60,13 @@ DataTable commence ici-->
                                 <img src="{{ url_for('static', filename='lock-fill.svg') }}" alt="Icon cadena fermé">
                             </button>
                         {% endif %}
+                    </td>
+                {% endif %}
+                {% if lookOption == True %}
+                    <td class="text-center">
+                        <a href="{{ url_for('accountAction.details', login=row['Login']) }}" class="btn btn-outline-primary btn-sm disable">
+                            <img src="{{ url_for('static', filename='search.svg') }}" alt="Icone loupe">
+                        </a>
                     </td>
                 {% endif %}
             </tr>
@@ -135,3 +148,9 @@ DataTable commence ici-->
         </div>
     </div>
 </div>
+
+{% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='datatables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='dataTable_user.js') }}"></script>
+{% endblock %}

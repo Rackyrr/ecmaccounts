@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+<body>
+
+{% block content %}
+    <div class="container mt-3 full-width">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Compte
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title">
+                            <p><strong>Login :</strong> {{ user['login'] }}</p>
+                        </div>
+                        <p><strong>Email :</strong> {{ user['email'] }}</p>
+                        <p><strong>Groupe :</strong> {{ user['groupe'] }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Actions
+                    </div>
+                    <div class="card-body">
+                        <div class="col-md-12 mb-1">
+                            <a href="#" class="btn btn-secondary w-100">Envoyer un mail à {{ user['login'] }}</a>
+                        </div>
+                        {% if locked == True %}
+                            <div class="col-md-12 mb-1">
+                                <button data-bs-toggle="modal" data-bs-target="#unlock"
+                                   class="btn btn-success w-100">Débloquer {{ user['login'] }}
+                                </button>
+                            </div>
+                        {% else %}
+                            <div class="col-md-12 mb-1">
+                                <button data-bs-toggle="modal" data-bs-target="#lock" class="btn btn-secondary w-100">
+                                    Bloquer {{ user['login'] }}
+                                </button>
+                            </div>
+                        {% endif %}
+                        <div class="col-md-12">
+                            <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                Supprimer {{ user['login'] }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-1">
+            <div class="col-md-12">
+                <!-- Résultat du CSV
+                Card Bootstrap-->
+                <div class="card w-100">
+                    <div class="card-header">
+                        Historique des actions sur le compte
+                    </div>
+                    <div class="card-body">
+                        {% include 'dataTable_history.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour supprimer un compte -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Supprimer {{ user['login'] }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('accountAction.delete') }}" method="post">
+                        <input type="hidden" name="deleteListLogin" id="deleteListLogin" value="{{ user['login'] }}">
+                        <label for="reason" class="form-label">Raison de la suppression</label>
+                        <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <input type="submit" class="btn btn-danger" value="Supprimer"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour Bloquer/Débloquer un compte -->
+    {% if locked == False %}
+        <div class="modal fade" id="lock" tabindex="-1" aria-labelledby="lock" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="lockModalTitle">Bloquer l'utilisateur {{ user['login'] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ url_for('accountAction.lock') }}" method="post">
+                            <input type="hidden" name="login" value="{{ user['login'] }}">
+                            <label for="reason" class="form-label">Raison du blocage</label>
+                            <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <input type="submit" class="btn btn-danger" value="Bloquer"/>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="modal fade" id="unlock" tabindex="-1" aria-labelledby="" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="unlockModalTitle">Débloquer l'utilisateur {{ user['login'] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ url_for('accountAction.unlock') }}" method="post">
+                            <input type="hidden" name="login" value="{{ user['login'] }}">
+                            <label for="reason" class="form-label">Raison du déblocage</label>
+                            <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <input type="submit" class="btn btn-danger" value="Débloquer"/>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

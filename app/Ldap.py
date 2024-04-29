@@ -3,6 +3,11 @@ from ldap3 import Server, ALL, Connection
 
 
 class Ldap:
+    """
+    Classe pour la connexion à l'annuaire LDAP
+    Fournir les informations de connexion dans un fichier de configuration
+    """
+
     _instance = None
 
     def __new__(cls):
@@ -29,19 +34,6 @@ class Ldap:
         """
         self.connection.unbind()
 
-    def getUserMail(self, login):
-        """
-        Recuperer l'email d'un utilisateur par le login
-        :param login:
-        :return:
-        """
-        with self.connection as conn:
-            conn.search(current_app.config['LDAP_SEARCH_BASE'], '(&(objectclass=supannPerson)(uid=' + login + '))',
-                        attributes=['mailLocalAddress'], search_scope='SUBTREE')
-            if len(conn.response) == 0:
-                return None
-            return conn.response[0]['attributes']['mailLocalAddress'][0]
-
     def getAllUsersBasicInfo(self):
         """
         Recuperer les informations de base de tous les utilisateurs
@@ -50,11 +42,12 @@ class Ldap:
         """
         with self.connection as conn:
             conn.search(current_app.config['LDAP_SEARCH_BASE'], '(objectclass=supannPerson)',
-                        attributes=['uid', 'mailLocalAddress', 'supannAffectation'], search_scope='SUBTREE')
+                        attributes=['uid', 'uidNumber', 'mailLocalAddress', 'supannAffectation'], search_scope='SUBTREE')
             AccountsMail = {}
             for entry in conn.response:
                 email = entry['attributes'].get('mailLocalAddress', '')
                 groupe = entry['attributes'].get('supannAffectation', '')
+                uidNumber = entry['attributes'].get('uidNumber', '')
                 if email:
                     email = email[0]
                 else:
@@ -66,8 +59,8 @@ class Ldap:
                         groupe = groupe[0]
                 else:
                     groupe = 'Non renseigné'
-                AccountsMail[entry['attributes']['uid'][0]] = {'email': email, 'groupe': groupe}
-            print(AccountsMail)
+                AccountsMail[entry['attributes']['uid'][0]] = {'email': email, 'groupe': groupe,
+                                                               'uidNumber': uidNumber}
             return AccountsMail
 
     def getUserByLogin(self, login):
@@ -78,12 +71,28 @@ class Ldap:
         """
         with self.connection as conn:
             conn.search(current_app.config['LDAP_SEARCH_BASE'], '(&(objectclass=supannPerson)(uid=' + login + '))',
-                        attributes=['uid', 'mailLocalAddress'],
+                        attributes=['uid', 'uidNumber', 'mailLocalAddress', 'supannAffectation'],
                         search_scope='SUBTREE')
             if len(conn.response) == 0:
                 return None
+            email = conn.response[0]['attributes'].get('mailLocalAddress', '')
+            groupe = conn.response[0]['attributes'].get('supannAffectation', '')
+            uidNumber = conn.response[0]['attributes'].get('uidNumber', '')
+            if email:
+                email = email[0]
+            else:
+                email = 'Non renseigné'
+            if groupe:
+                if len(groupe) > 1:
+                    groupe = ", ".join(groupe)
+                elif len(groupe) == 1:
+                    groupe = groupe[0]
+                else:
+                    groupe = 'Non renseigné'
             return {"login": conn.response[0]['attributes']['uid'][0],
-                    "email": conn.response[0]['attributes']['mailLocalAddress'][0]}
+                    "email": email,
+                    "groupe": groupe,
+                    "uidNumber": uidNumber}
 
     def seeUserExample(self):
         """

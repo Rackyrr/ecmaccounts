@@ -1,8 +1,4 @@
 {% extends 'base.html' %}
-    {% block styles %}
-        <link rel="stylesheet" href="{{ url_for('static', filename='datatables.min.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    {% endblock %}
 <body>
 
 {% block content %}
@@ -17,7 +13,7 @@
                     <div class="card-title">
                         <p><strong>Nom du fichier :</strong> {{ filename }}</p>
                     </div>
-                    <a href="{{ url_for('csvMailActivity.upload') }}" class="btn btn-primary">Télécharger un autre fichier CSV</a>
+                    <a href="{{ url_for('activity.csvMailActivity.upload') }}" class="btn btn-primary">Télécharger un autre fichier CSV</a>
                 </div>
             </div>
         </div>
@@ -31,16 +27,10 @@
                     Comptes
                 </div>
                 <div class="card-body">
-                    {% include 'dataTable.html' %}
+                    {% include 'dataTable_user.html' %}
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{{ url_for('static', filename='datatables.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='tableau.js') }}"></script>
 {% endblock %}

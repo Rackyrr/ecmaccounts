@@ -2,4 +2,4 @@ from flask import Blueprint
 
 bp = Blueprint('csvMailActivity', __name__)
 
-from app.csvMailActivity import routes
+from app.activity.csvMailActivity import routes

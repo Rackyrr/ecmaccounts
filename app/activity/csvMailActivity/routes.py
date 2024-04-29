@@ -6,14 +6,14 @@ from datetime import datetime, timedelta
 from flask import render_template, request, current_app, redirect, url_for
 from werkzeug.utils import secure_filename
 
-from app.csvMailActivity import bp
+from app.activity.csvMailActivity import bp
 from app.models.Account import Account
 from app.Ldap import Ldap
 
 locale.setlocale(locale.LC_ALL, 'fr_FR.utf8')
 
 
-@bp.route('/csv/upload')
+@bp.route('/upload')
 def upload():
     """
     Afficher le modèle d'import CSV.
@@ -22,7 +22,7 @@ def upload():
     return render_template('uploadCSV.html')
 
 
-@bp.route('/csv/user_mail', methods=['GET', 'POST'])
+@bp.route('/user_mail', methods=['GET', 'POST'])
 def mailActivity():
     """
     Importer un fichier CSV contenant les données d'activité des utilisateurs et les traiter.
@@ -78,13 +78,14 @@ def mailActivity():
                     continue
 
         # Rendre le modèle avec les données traitées pour affichage
-        return render_template('mailActivityCSV.html', donnees=donnees, filename=secure_filename(file.filename))
+        return render_template('mailActivityCSV.html', donnees=donnees,
+                               filename=secure_filename(file.filename), lookOption=False)
 
     # Si la méthode de la requête n'est pas POST, afficher le modèle d'import CSV
-    return redirect(url_for('csvMailActivity.upload'))
+    return redirect(url_for('activity.csvMailActivity.upload'))
 
 
 @bp.route('/test')
 def test():
     ldap = Ldap()
-    return ldap.getAllUserMail()
+    return ldap.seeUserExample()

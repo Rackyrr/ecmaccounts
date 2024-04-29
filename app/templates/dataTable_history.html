@@ -1,0 +1,35 @@
+{% block styles %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='datatables.min.css') }}">
+{% endblock %}
+
+<!-- Affichez les données
+DataTable commence ici-->
+{% if donnees %}
+    <table id="myTable" class="table">
+        <thead class="thead-dark">
+            <tr>
+                {% for key in donnees[0].keys() %}
+                    <th>{{ key }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in donnees %}
+                <tr>
+                    {% for value in row.values() %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <h2 class="heading-text text-center">Il n'y a pas actions dans l'historique du compte</h2>
+{% endif %}
+<!-- DataTable termine ici-->
+
+{% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='datatables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='dataTable_history.js') }}"></script>
+{% endblock %}

@@ -22,8 +22,10 @@ def userToKeep():
         accountMail = emailAccounts.get(account.login)
         if accountMail is None:
             accountMail = 'Non renseigné'
+        else:
+            accountMail = accountMail['email']
         accountsReadModel.append({'Login': account.login, 'Email': accountMail, 'Depuis': storageTime.since,
                                   'Jusqu\'à': storageTime.until, 'Raison': storageTime.reason,
                                   'locked': account.locked if account is not None else False})
 
-    return render_template('userToKeep.html', donnees=accountsReadModel)
+    return render_template('userToKeep.html', donnees=accountsReadModel, lookOption=False)
