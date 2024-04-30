@@ -40,5 +40,9 @@ def create_app(config_class=Config):
     from app.allAccounts import bp as allAccounts_bp
     app.register_blueprint(allAccounts_bp, url_prefix='/all_accounts')
 
+    # LastSetPwd blueprint
+    from app.lastSetPwd import bp as lastSetPwd_bp
+    app.register_blueprint(lastSetPwd_bp, url_prefix='/password')
+
     return app
 

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-3 full-width">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    Filtrer
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('lastSetPwd.last_set') }}" method="POST">
+                        <div class="form-group">
+                            <div class="card-title">
+                                <label for="password_expiration">Durée de non modification du mot de passe (en jours)</label>
+                            </div>
+                            <input type="number" class="form-control" id="password_expiration" name="password_expiration" value="{{ password_expiration }}">
+                            <button type="submit" class="btn btn-primary mt-1">Filtrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-1">
+        <div class="col-md-12">
+            <div class="card w-100">
+                <div class="card-header">
+                    Comptes avec le mot de passe non modifié depuis plus de {{ password_expiration }} jours
+                </div>
+                <div class="card-body">
+                    {% include 'dataTable_user.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

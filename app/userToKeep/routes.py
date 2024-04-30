@@ -28,4 +28,4 @@ def userToKeep():
                                   'Jusqu\'à': storageTime.until, 'Raison': storageTime.reason,
                                   'locked': account.locked if account is not None else False})
 
-    return render_template('userToKeep.html', donnees=accountsReadModel, lookOption=False)
+    return render_template('userToKeep.html', donnees=accountsReadModel, lookOption=True)

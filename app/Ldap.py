@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from flask import current_app
 from ldap3 import Server, ALL, Connection
 
@@ -22,7 +24,7 @@ class Ldap:
     def connect(self):
         """
         Connecter à l'annuaire LDAP
-        :return:
+        :return: Connection ldap3
         """
         server = Server(current_app.config['LDAP_SERVER'], get_info=ALL)
         return Connection(server, user=current_app.config['LDAP_USER'], password=current_app.config['LDAP_PASSWORD'],
@@ -38,11 +40,12 @@ class Ldap:
         """
         Recuperer les informations de base de tous les utilisateurs
         (login, email, groupe)
-        :return: Dictionnaire
+        :return: Liste de Dictionnaires (login, email, groupe)
         """
         with self.connection as conn:
             conn.search(current_app.config['LDAP_SEARCH_BASE'], '(objectclass=supannPerson)',
-                        attributes=['uid', 'uidNumber', 'mailLocalAddress', 'supannAffectation'], search_scope='SUBTREE')
+                        attributes=['uid', 'uidNumber', 'mailLocalAddress', 'supannAffectation'],
+                        search_scope='SUBTREE')
             AccountsMail = {}
             for entry in conn.response:
                 email = entry['attributes'].get('mailLocalAddress', '')
@@ -67,7 +70,7 @@ class Ldap:
         """
         Recuperer un utilisateur par le login
         :param login:
-        :return:
+        :return: Dictionnaire (login, email, groupe)
         """
         with self.connection as conn:
             conn.search(current_app.config['LDAP_SEARCH_BASE'], '(&(objectclass=supannPerson)(uid=' + login + '))',
@@ -100,6 +103,42 @@ class Ldap:
         :return:
         """
         with self.connection as conn:
-            conn.search(current_app.config['LDAP_SEARCH_BASE'], '(objectclass=supannPerson)',
+            conn.search(current_app.config['LDAP_SEARCH_BASE'], '(&(objectclass=supannPerson)(uid=moi2006))',
                         attributes=['*'], search_scope='SUBTREE')
             return str(conn.response[0])
+
+    def getUsersWithPwdLastSetOver(self, days):
+        """
+        Recuperer les utilisateurs dont le mot de passe a été modifié il y a plus de x jours
+        :param days:unix timestamp
+        :return: liste des utilisateurs correspondants à la recherche (login, email, groupe, pwdChangedTime)
+        """
+        with self.connection as conn:
+            conn.search(current_app.config['LDAP_SEARCH_BASE'], '(objectclass=supannPerson)',
+                        attributes=['uid', 'mailLocalAddress', 'supannAffectation', 'sambaPwdLastSet'],
+                        search_scope='SUBTREE')
+            Accounts = []
+            for entry in conn.response:
+                pwdChangedTime = entry['attributes'].get('sambaPwdLastSet', '')
+                email = entry['attributes'].get('mailLocalAddress', '')
+                groupe = entry['attributes'].get('supannAffectation', '')
+                if email:
+                    email = email[0]
+                else:
+                    email = 'Non renseigné'
+                if groupe:
+                    if len(groupe) > 1:
+                        groupe = ", ".join(groupe)
+                    else:
+                        groupe = groupe[0]
+                else:
+                    groupe = 'Non renseigné'
+                if pwdChangedTime:
+                    pwdChangedTime = datetime.fromtimestamp(pwdChangedTime)
+                    if (datetime.now() - pwdChangedTime) >= timedelta(days=days):
+                        Accounts.append({'login': entry['attributes']['uid'][0], 'email': email, 'groupe': groupe,
+                                         'pwdChangedTime': pwdChangedTime, 'NeverChanged': False})
+                else:
+                    Accounts.append({'login': entry['attributes']['uid'][0], 'email': email, 'groupe': groupe,
+                                     'pwdChangedTime': '', 'NeverChanged': True})
+            return Accounts

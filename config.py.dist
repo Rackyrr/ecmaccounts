@@ -10,3 +10,4 @@ class Config(object):
     LDAP_PASSWORD = "password"
     LDAP_SEARCH_BASE = 'ou=user,dc=example,dc=fr'
     UPLOAD_FOLDER = 'app/uploads'
+    DEFAULT_PWD_LAST_SET = 365
