@@ -88,7 +88,7 @@ DataTable commence ici-->
                         </div>
                         <div class="modal-body">
                             <form action="{{ url_for('accountAction.lock') }}" method="post">
-                                <input type="hidden" name="login" value="{{ row['Login'] }}">
+                                <input type="hidden" name="blockListLogin" value="{{ row['Login'] }}">
                                 <label for="reason" class="form-label">Raison du blocage</label>
                                 <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
                                 <div class="modal-footer">
@@ -110,7 +110,7 @@ DataTable commence ici-->
                         </div>
                         <div class="modal-body">
                             <form action="{{ url_for('accountAction.unlock') }}" method="post">
-                                <input type="hidden" name="login" value="{{ row['Login'] }}">
+                                <input type="hidden" name="unblockListLogin" value="{{ row['Login'] }}">
                                 <label for="reason" class="form-label">Raison du déblocage</label>
                                 <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
                                 <div class="modal-footer">
@@ -142,6 +142,77 @@ DataTable commence ici-->
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                         <input type="submit" class="btn btn-danger" value="Supprimer"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour garder les comptes -->
+<div class="modal fade" id="keepModal" tabindex="-1" aria-labelledby="keepModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="keepModalLabel">Garder les comptes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('accountAction.keep') }}" method="post">
+                    <input type="hidden" name="keepListLogin" id="keepListLogin">
+                    <label for="until" class="form-label">Garder jusqu'à :</label>
+                    <input type="datetime-local" class="form-control" name="until" id="until" placeholder="Date">
+                    <label for="reason" class="form-label">Raison de la conservation</label>
+                    <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <input type="submit" class="btn btn-danger" value="Garder"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal pour Bloquer compte(s)-->
+<div class="modal fade" id="blockModal" tabindex="-1" aria-labelledby="blockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="keepModalLabel">Bloquer les comptes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('accountAction.lock') }}" method="post">
+                    <input type="hidden" name="blockListLogin" id="blockListLogin">
+                    <label for="reason" class="form-label">Raison de la conservation</label>
+                    <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <input type="submit" class="btn btn-danger" value="Bloquer"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal pour Débloquer compte(s)-->
+<div class="modal fade" id="unblockModal" tabindex="-1" aria-labelledby="unblockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="keepModalLabel">Débloquer les comptes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('accountAction.unlock') }}" method="post">
+                    <input type="hidden" name="unblockListLogin" id="unblockListLogin">
+                    <label for="reason" class="form-label">Raison de la conservation</label>
+                    <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <input type="submit" class="btn btn-danger" value="Bloquer"/>
                     </div>
                 </form>
             </div>

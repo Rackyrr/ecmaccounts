@@ -3,6 +3,7 @@ from flask_migrate import Migrate
 
 from app.extensions import db
 from config import Config
+from app.models import TemplateMail, Account, User, Action, AccountStorageTime, History
 
 
 def create_app(config_class=Config):
@@ -43,6 +44,9 @@ def create_app(config_class=Config):
     # LastSetPwd blueprint
     from app.lastSetPwd import bp as lastSetPwd_bp
     app.register_blueprint(lastSetPwd_bp, url_prefix='/password')
+
+    from app.Mail import bp as mail_bp
+    app.register_blueprint(mail_bp, url_prefix='/mail')
 
     return app
 

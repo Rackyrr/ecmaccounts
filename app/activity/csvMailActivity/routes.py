@@ -1,5 +1,4 @@
 import csv
-import locale
 import os
 from datetime import datetime, timedelta
 
@@ -9,8 +8,6 @@ from werkzeug.utils import secure_filename
 from app.activity.csvMailActivity import bp
 from app.models.Account import Account
 from app.Ldap import Ldap
-
-locale.setlocale(locale.LC_ALL, 'fr_FR.utf8')
 
 
 @bp.route('/upload')
@@ -59,8 +56,8 @@ def mailActivity():
                 account = Account.query.filter_by(login=ligneTab[1]).first()
                 if (account is not None and account.deleted is False) or account is None:
                     # Calculer la date d'activité et la durée d'inactivité
-                    dateActivite = datetime.strptime(ligneTab[0], "%a %d %b %Y %H:%M:%S %Z").date()
-                    dureeInactif = dateActivite - timedelta(days=int(ligneTab[2]))
+                    dateActivite = datetime.strptime(ligneTab[0], "%Y-%m-%dT%H:%M:%S%z")
+                    dureeInactif = dateActivite.date() - timedelta(days=int(ligneTab[2]))
                     nbJourInactif = (datetime.now().date() - dureeInactif).days
                     # Déterminer l'email test de l'utilisateur à partir de LDAP
                     info = infoAccounts.get(ligneTab[1])

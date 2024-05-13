@@ -22,18 +22,18 @@ def last_set():
         account_db = Account.query.filter_by(login=account['login']).first()
         if account_db is None:
             accountsReadModel.append({
-                'login': account['login'],
-                'email': account['email'],
-                'groupe': account['groupe'],
+                'Login': account['login'],
+                'Email': account['email'],
+                'Groupe': account['groupe'],
                 'Dernier changement de mot de passe': account['pwdChangedTime'],
                 'Jamais modifié' : account['NeverChanged'],
                 'locked': False,
             })
         else:
             accountsReadModel.append({
-                'login': account['login'],
-                'email': account['email'],
-                'groupe': account['groupe'],
+                'Login': account['login'],
+                'Email': account['email'],
+                'Groupe': account['groupe'],
                 'Dernier changement de mot de passe': account['pwdChangedTime'],
                 'Jamais modifié': account['NeverChanged'],
                 'locked': account_db.locked,

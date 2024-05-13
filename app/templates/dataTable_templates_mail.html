@@ -1,0 +1,122 @@
+{% block styles %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='datatables.min.css') }}">
+{% endblock %}
+
+<!-- Affichez les données
+DataTable commence ici-->
+{% if donnees %}
+    <table id="myTable" class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th>Nom template</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in donnees %}
+                <tr>
+                    <th>{{ row['Nom template'] }}</th>
+                    <th class="text-end">
+                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#Edit{{ row['Nom template'] }}">
+                            <img src="{{ url_for('static', filename='pencil-square.svg') }}" alt="edit">
+                        </button>
+                        <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#Delete{{ row['Nom template'] }}">
+                            <img src="{{ url_for('static', filename='trash-fill.svg') }}" alt="trash">
+                        </button>
+                        <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#Use{{ row['Nom template'] }}">
+                            Utiliser
+                        </button>
+                    </th>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <h3 class="heading-text text-center">Il n'y a pas encore de templates enregistrées</h3>
+{% endif %}
+<!-- DataTable termine ici-->
+
+{% for row in donnees %}
+    <!--Modal de suppression-->
+    <div class="modal fade modal-xl" id="Delete{{ row['Nom template'] }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Supprimer le template</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Êtes-vous sûr de vouloir supprimer le template {{ row['Nom template'] }} ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <a href="{{ url_for('mail.templateAction.deleteTemp', templateName=row['Nom template']) }}" class="btn btn-danger">Supprimer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal de modification-->
+    <div class="modal fade modal-xl" id="Edit{{ row['Nom template'] }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modifier le template</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('mail.templateAction.update') }}" method="POST">
+                        <input type="hidden" name="templateName" value="{{ row['Nom template'] }}">
+                        <div class="mb-3">
+                            <label for="title_template" class="form-label">Nom template</label>
+                            <input type="text" class="form-control" id="title_template" name="title_template" value="{{ row['Nom template'] }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject_update" class="form-label">Sujet</label>
+                            <input type="text" class="form-control" id="subject_update" name="subject_update" value="{{ row['Sujet'] }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="message_update" class="form-label">Message</label>
+                            <textarea class="form-control" id="message_update" name="message_update" rows="3">{{ row['Message'] }}</textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal bouton utiliser-->
+    <div class="modal fade modal-xl" id="Use{{ row['Nom template'] }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Utiliser le template {{ row['Nom template'] }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-title">
+                        <h4>{{ row['Nom template'] }}</h4>
+                    </div>
+                    <h5>Sujet</h5>
+                    <p>{{ row['Sujet'] }}</p>
+                    <h5>Message</h5>
+                    <p>{{ row['Message'] }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button class="btn btn-success" onclick="use_template('{{ row['Nom template'] }}', '{{ row['Sujet'] }}', '{{ row['Message']|replace('\r\n', '\\n') }}')">Utiliser</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+{% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='datatables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='dataTable_template.js') }}"></script>
+{% endblock %}

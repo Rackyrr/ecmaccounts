@@ -40,6 +40,11 @@
                                 </button>
                             </div>
                         {% endif %}
+                        <div class="col-md-12 mb-1">
+                            <button data-bs-toggle="modal" data-bs-target="#keepModal" class="btn btn-secondary w-100">
+                                Garder {{ user['login'] }}
+                            </button>
+                        </div>
                         <div class="col-md-12">
                             <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteModal">
                                 Supprimer {{ user['login'] }}
@@ -134,5 +139,30 @@
             </div>
         </div>
     {% endif %}
+
+    <!--Modal pour Garder le compte-->
+    <div class="modal fade" id="keepModal" tabindex="-1" aria-labelledby="keepModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="keepModalLabel">Garder les comptes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('accountAction.keep') }}" method="post">
+                        <input type="hidden" name="keepListLogin" id="keepListLogin" value="{{ user['login'] }}">
+                        <label for="until" class="form-label">Garder jusqu'à :</label>
+                        <input type="datetime-local" class="form-control" name="until" id="until" placeholder="Date">
+                        <label for="reason" class="form-label">Raison de la conservation</label>
+                        <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <input type="submit" class="btn btn-danger" value="Garder"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
