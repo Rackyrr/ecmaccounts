@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_migrate import Migrate
 
-from app.extensions import db
+from app.extensions import db, flaskMail
 from config import Config
 from app.models import TemplateMail, Account, User, Action, AccountStorageTime, History
 
@@ -18,6 +18,7 @@ def create_app(config_class=Config):
     # Flask extensions
     db.init_app(app)
     migrate = Migrate(app, db, compare_type=True)
+    flaskMail.init_app(app)
 
     # Blueprint registration
 
@@ -31,7 +32,7 @@ def create_app(config_class=Config):
 
     # UserToKeep blueprint
     from app.userToKeep import bp as userToKeep_bp
-    app.register_blueprint(userToKeep_bp, url_prefix='/keep_user')
+    app.register_blueprint(userToKeep_bp, url_prefix='/keep-user')
 
     # AccountAction blueprint
     from app.accountAction import bp as accountAction_bp
@@ -39,7 +40,7 @@ def create_app(config_class=Config):
 
     # AllAccounts blueprint
     from app.allAccounts import bp as allAccounts_bp
-    app.register_blueprint(allAccounts_bp, url_prefix='/all_accounts')
+    app.register_blueprint(allAccounts_bp, url_prefix='/all-accounts')
 
     # LastSetPwd blueprint
     from app.lastSetPwd import bp as lastSetPwd_bp
@@ -47,6 +48,9 @@ def create_app(config_class=Config):
 
     from app.Mail import bp as mail_bp
     app.register_blueprint(mail_bp, url_prefix='/mail')
+
+    from app.waiting_to_delete import bp as waiting_to_delete_bp
+    app.register_blueprint(waiting_to_delete_bp, url_prefix='/waiting-to-delete')
 
     return app
 

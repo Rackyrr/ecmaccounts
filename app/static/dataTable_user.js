@@ -59,14 +59,33 @@ let table = new DataTable('#myTable', {
                     className: 'btn-danger'
                 },
                 {
+                    text: 'Annuler suppression',
+                    action: function (e, dt, node, config, cb) {
+                        const selectedRows = dt.rows({ selected: true });
+                        if (selectedRows.count() > 0) {
+                            let loginList = [];
+                            selectedRows.every(function () {
+                                loginList.push(this.data()[0]);
+                            });
+                            $('#cancelDeleteListLogin').val(loginList.join(','));
+                            $('#cancelDeleteModal').modal('show');
+                        } else {
+                            alert('Sélectionnez au moins une ligne');
+                        }
+                    }
+                },
+                {
                     text:'Envoyer un mail',
                     action: function (e, dt, node, config, cb) {
                         const selectedRows = dt.rows({ selected: true });
                         if (selectedRows.count() > 0) {
+                            let mailList = [];
                             //Affiche chaque ligne sélectionné dans la console
                             selectedRows.every(function () {
-                                console.log("Envoyer mail " + this.data()[0]);
+                                mailList.push(this.data()[1]);
                             });
+                            $('#listMail').val(mailList.join(','));
+                            $('#sendMailList').submit()
                         } else {
                             alert('Sélectionnez au moins une ligne');
                         }

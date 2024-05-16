@@ -24,9 +24,10 @@
                         Actions
                     </div>
                     <div class="card-body">
-                        <div class="col-md-12 mb-1">
-                            <a href="#" class="btn btn-secondary w-100">Envoyer un mail à {{ user['login'] }}</a>
-                        </div>
+                        <form method="post" action="{{ url_for('mail.writing') }}" class="col-md-12 mb-1">
+                            <input type="hidden" name="mail" value="{{ user['email'] }}">
+                            <button type="submit" class="btn btn-secondary w-100">Envoyer un mail à {{ user['login'] }}</button>
+                        </form>
                         {% if locked == True %}
                             <div class="col-md-12 mb-1">
                                 <button data-bs-toggle="modal" data-bs-target="#unlock"
@@ -104,7 +105,7 @@
                     </div>
                     <div class="modal-body">
                         <form action="{{ url_for('accountAction.lock') }}" method="post">
-                            <input type="hidden" name="login" value="{{ user['login'] }}">
+                            <input type="hidden" name="blockListLogin" value="{{ user['login'] }}">
                             <label for="reason" class="form-label">Raison du blocage</label>
                             <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
                             <div class="modal-footer">
@@ -126,7 +127,7 @@
                     </div>
                     <div class="modal-body">
                         <form action="{{ url_for('accountAction.unlock') }}" method="post">
-                            <input type="hidden" name="login" value="{{ user['login'] }}">
+                            <input type="hidden" name="unblockListLogin" value="{{ user['login'] }}">
                             <label for="reason" class="form-label">Raison du déblocage</label>
                             <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
                             <div class="modal-footer">

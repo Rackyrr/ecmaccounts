@@ -16,8 +16,6 @@ let table = new DataTable('#myTable', {
             cells : "",
         }
     },
-    //Organisation visuelle du tableau
-    dom: "Qfrtip", //Affiche seulement la recherche avancée avec la congifuration par défaut
 });
 
 function use_template(title ,newSubject, newMessage){

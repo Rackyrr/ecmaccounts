@@ -44,7 +44,7 @@ class Ldap:
         """
         with self.connection as conn:
             conn.search(current_app.config['LDAP_SEARCH_BASE'], '(objectclass=supannPerson)',
-                        attributes=['uid', 'uidNumber', 'mailLocalAddress', 'supannAffectation'],
+                        attributes=['uid', 'uidNumber', 'mailLocalAddress', 'supannAffectation', 'displayName'],
                         search_scope='SUBTREE')
             AccountsMail = {}
             for entry in conn.response:
@@ -62,8 +62,10 @@ class Ldap:
                         groupe = groupe[0]
                 else:
                     groupe = 'Non renseigné'
-                AccountsMail[entry['attributes']['uid'][0]] = {'email': email, 'groupe': groupe,
-                                                               'uidNumber': uidNumber}
+                AccountsMail[entry['attributes']['uid'][0]] = {'email': email,
+                                                               'groupe': groupe,
+                                                               'uidNumber': uidNumber,
+                                                               'name': entry['attributes']['displayName']}
             return AccountsMail
 
     def getUserByLogin(self, login):
@@ -74,7 +76,7 @@ class Ldap:
         """
         with self.connection as conn:
             conn.search(current_app.config['LDAP_SEARCH_BASE'], '(&(objectclass=supannPerson)(uid=' + login + '))',
-                        attributes=['uid', 'uidNumber', 'mailLocalAddress', 'supannAffectation'],
+                        attributes=['uid', 'uidNumber', 'mailLocalAddress', 'supannAffectation', 'displayName'],
                         search_scope='SUBTREE')
             if len(conn.response) == 0:
                 return None
@@ -95,7 +97,41 @@ class Ldap:
             return {"login": conn.response[0]['attributes']['uid'][0],
                     "email": email,
                     "groupe": groupe,
-                    "uidNumber": uidNumber}
+                    "uidNumber": uidNumber,
+                    "name": conn.response[0]['attributes']['displayName']}
+
+    def getUserByMail(self, mail):
+        """
+        Recuperer un utilisateur par le mail
+        :param mail:
+        :return: Dictionnaire (login, email, groupe)
+        """
+        with self.connection as conn:
+            conn.search(current_app.config['LDAP_SEARCH_BASE'],
+                        '(&(objectclass=supannPerson)(mailLocalAddress=' + mail + '))',
+                        attributes=['uid', 'uidNumber', 'mailLocalAddress', 'supannAffectation', 'displayName'],
+                        search_scope='SUBTREE')
+            if len(conn.response) == 0:
+                return None
+            email = conn.response[0]['attributes'].get('mailLocalAddress', '')
+            groupe = conn.response[0]['attributes'].get('supannAffectation', '')
+            uidNumber = conn.response[0]['attributes'].get('uidNumber', '')
+            if email:
+                email = email[0]
+            else:
+                email = 'Non renseigné'
+            if groupe:
+                if len(groupe) > 1:
+                    groupe = ", ".join(groupe)
+                elif len(groupe) == 1:
+                    groupe = groupe[0]
+                else:
+                    groupe = 'Non renseigné'
+            return {"login": conn.response[0]['attributes']['uid'][0],
+                    "email": email,
+                    "groupe": groupe,
+                    "uidNumber": uidNumber,
+                    "name": conn.response[0]['attributes']['displayName']}
 
     def seeUserExample(self):
         """
@@ -103,7 +139,7 @@ class Ldap:
         :return:
         """
         with self.connection as conn:
-            conn.search(current_app.config['LDAP_SEARCH_BASE'], '(&(objectclass=supannPerson)(uid=moi2006))',
+            conn.search(current_app.config['LDAP_SEARCH_BASE'], '(&(objectclass=supannPerson)(uid=gt))',
                         attributes=['*'], search_scope='SUBTREE')
             return str(conn.response[0])
 

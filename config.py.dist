@@ -6,8 +6,12 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'postgresql://user:pwd@lhost:port/db_name'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LDAP_SERVER = 'ldaps://ldap.example.net'
-    LDAP_USER = "cn=user,ou=users,dc=example,dc=fr"
+    LDAP_USER = "cn=user,ou=users,dc=example,dc=net"
     LDAP_PASSWORD = "password"
-    LDAP_SEARCH_BASE = 'ou=user,dc=example,dc=fr'
+    LDAP_SEARCH_BASE = 'ou=user,dc=example,dc=net'
     UPLOAD_FOLDER = 'app/uploads'
     DEFAULT_PWD_LAST_SET = 365
+    MAIL_SERVER = 'smtp.example.net'
+    MAIL_PORT = 25
+    MAIL_USE_TLS = False
+    MAIL_USERNAME = 'mail@example.net'

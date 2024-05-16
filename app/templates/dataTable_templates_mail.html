@@ -108,7 +108,7 @@ DataTable commence ici-->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button class="btn btn-success" onclick="use_template('{{ row['Nom template'] }}', '{{ row['Sujet'] }}', '{{ row['Message']|replace('\r\n', '\\n') }}')">Utiliser</button>
+                    <button class="btn btn-success" onclick="use_template('{{ row['Nom template'] }}', '{{ row['Sujet'] }}', '{{ row['Message']|replace('\r\n', '\\n')|replace('\'',"\\'") }}')">Utiliser</button>
                 </div>
             </div>
         </div>

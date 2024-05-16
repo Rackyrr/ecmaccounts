@@ -15,115 +15,119 @@ Import js :
 
 <!-- Affichez les données
 DataTable commence ici-->
-<table id="myTable" class="table">
-    <thead class="thead-dark">
-        <tr>
-            {% for key in donnees[0].keys() %}
-                {% if 'locked' in donnees[0] %}
-                    {% if loop.index < loop.length %}
-                        <th>{{ key }}</th>
-                    {% endif %}
-                {% else %}
-                    <th>{{ key }}</th>
-                {% endif %}
-            {% endfor %}
-            {% if 'locked' in donnees[0] %}
-                <th>Bloquer/Débloquer</th>
-            {% endif %}
-            {% if lookOption == True %}
-                <th>Plus de détails</th>
-            {% endif %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in donnees %}
+{% if donnees %}
+    <table id="myTable" class="table">
+        <thead class="thead-dark">
             <tr>
-                {% for value in row.values() %}
-                    {% if 'locked' in row %}
+                {% for key in donnees[0].keys() %}
+                    {% if 'locked' in donnees[0] %}
                         {% if loop.index < loop.length %}
-                            <td>{{ value }}</td>
+                            <th>{{ key }}</th>
                         {% endif %}
                     {% else %}
-                        <td>{{ value }}</td>
+                        <th>{{ key }}</th>
                     {% endif %}
                 {% endfor %}
-                <!-- Ligne pour afficher les bouttons bloquer/débloquer.
-                Ne s'affiche que si dans la liste de dict il y a la clé 'locked'-->
-                {% if 'locked' in row %}
-                    <td class="text-center">
-                        {% if row['locked'] == False %}
-                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#lock{{ row['Login'] }}">
-                                <img src="{{ url_for('static', filename='unlock-fill.svg') }}" alt="Icon cadena ouvert">
-                            </button>
-                        {% else %}
-                            <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#unlock{{ row['Login'] }}">
-                                <img src="{{ url_for('static', filename='lock-fill.svg') }}" alt="Icon cadena fermé">
-                            </button>
-                        {% endif %}
-                    </td>
+                {% if 'locked' in donnees[0] %}
+                    <th>Bloquer/Débloquer</th>
                 {% endif %}
                 {% if lookOption == True %}
-                    <td class="text-center">
-                        <a href="{{ url_for('accountAction.details', login=row['Login']) }}" class="btn btn-outline-primary btn-sm disable">
-                            <img src="{{ url_for('static', filename='search.svg') }}" alt="Icone loupe">
-                        </a>
-                    </td>
+                    <th>Plus de détails</th>
                 {% endif %}
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<!-- DataTable termine ici-->
+        </thead>
+        <tbody>
+            {% for row in donnees %}
+                <tr>
+                    {% for value in row.values() %}
+                        {% if 'locked' in row %}
+                            {% if loop.index < loop.length %}
+                                <td>{{ value }}</td>
+                            {% endif %}
+                        {% else %}
+                            <td>{{ value }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    <!-- Ligne pour afficher les bouttons bloquer/débloquer.
+                    Ne s'affiche que si dans la liste de dict il y a la clé 'locked'-->
+                    {% if 'locked' in row %}
+                        <td class="text-center">
+                            {% if row['locked'] == False %}
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#lock{{ row['Login'] }}">
+                                    <img src="{{ url_for('static', filename='unlock-fill.svg') }}" alt="Icon cadena ouvert">
+                                </button>
+                            {% else %}
+                                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#unlock{{ row['Login'] }}">
+                                    <img src="{{ url_for('static', filename='lock-fill.svg') }}" alt="Icon cadena fermé">
+                                </button>
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                    {% if lookOption == True %}
+                        <td class="text-center">
+                            <a href="{{ url_for('accountAction.details', login=row['Login']) }}" class="btn btn-outline-primary btn-sm disable">
+                                <img src="{{ url_for('static', filename='search.svg') }}" alt="Icone loupe">
+                            </a>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- DataTable termine ici-->
 
-<!-- Modal pour bloquer/débloquer un utilisateur -->
-{% if 'locked' in donnees[0] %}
-    {% for row in donnees %}
-        {% if row['locked'] == False %}
-            <div class="modal fade" id="lock{{ row['Login'] }}" tabindex="-1" aria-labelledby="lock{{ row['Login'] }}" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Bloquer l'utilisateur {{ row['Login'] }}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="{{ url_for('accountAction.lock') }}" method="post">
-                                <input type="hidden" name="blockListLogin" value="{{ row['Login'] }}">
-                                <label for="reason" class="form-label">Raison du blocage</label>
-                                <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                    <input type="submit" class="btn btn-danger" value="Bloquer"/>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% else %}
-            <div class="modal fade" id="unlock{{ row['Login'] }}" tabindex="-1" aria-labelledby="unlock{{ row['Login'] }}" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Débloquer l'utilisateur {{ row['Login'] }}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="{{ url_for('accountAction.unlock') }}" method="post">
-                                <input type="hidden" name="unblockListLogin" value="{{ row['Login'] }}">
-                                <label for="reason" class="form-label">Raison du déblocage</label>
-                                <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                    <input type="submit" class="btn btn-danger" value="Débloquer"/>
-                                </div>
-                            </form>
+    <!-- Modal pour bloquer/débloquer un utilisateur -->
+    {% if 'locked' in donnees[0] %}
+        {% for row in donnees %}
+            {% if row['locked'] == False %}
+                <div class="modal fade" id="lock{{ row['Login'] }}" tabindex="-1" aria-labelledby="lock{{ row['Login'] }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Bloquer l'utilisateur {{ row['Login'] }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{{ url_for('accountAction.lock') }}" method="post">
+                                    <input type="hidden" name="blockListLogin" value="{{ row['Login'] }}">
+                                    <label for="reason" class="form-label">Raison du blocage</label>
+                                    <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                        <input type="submit" class="btn btn-danger" value="Bloquer"/>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        {% endif %}
-    {% endfor %}
+            {% else %}
+                <div class="modal fade" id="unlock{{ row['Login'] }}" tabindex="-1" aria-labelledby="unlock{{ row['Login'] }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Débloquer l'utilisateur {{ row['Login'] }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{{ url_for('accountAction.unlock') }}" method="post">
+                                    <input type="hidden" name="unblockListLogin" value="{{ row['Login'] }}">
+                                    <label for="reason" class="form-label">Raison du déblocage</label>
+                                    <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                        <input type="submit" class="btn btn-danger" value="Débloquer"/>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% else %}
+    <h3 class="heading-text text-center">Il n'y a pas encore d'utilisateurs pour cette table</h3>
 {% endif %}
 
 <!-- Modal pour la suppression d'un utilisateur -->
@@ -148,6 +152,26 @@ DataTable commence ici-->
         </div>
     </div>
 </div>
+
+<!--Modal pour annuler la suppression d'un utilisateur-->
+<div class="modal fade" id="cancelDeleteModal" tabindex="-1" aria-labelledby="cancelDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelDeleteModalLabel">Annuler la suppression de l'utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('accountAction.cancel_delete') }}" method="post">
+                    <input type="hidden" name="cancelDeleteListLogin" id="cancelDeleteListLogin">
+                    <label for="reason" class="form-label">Raison de l'annulation de la suppression</label>
+                    <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <input type="submit" class="btn btn-danger" value="Annuler suppression"/>
+                    </div>
+                </form>
+            </div>
 
 <!-- Modal pour garder les comptes -->
 <div class="modal fade" id="keepModal" tabindex="-1" aria-labelledby="keepModalLabel" aria-hidden="true">
@@ -219,6 +243,11 @@ DataTable commence ici-->
         </div>
     </div>
 </div>
+
+<!--Formulaire caché pour récupérer les emails sélectionnés-->
+<form method="post" action="{{ url_for('mail.writing') }}" id="sendMailList">
+    <input type="hidden" name="mail" id="listMail">
+</form>
 
 {% block scripts %}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

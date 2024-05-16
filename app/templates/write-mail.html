@@ -9,10 +9,14 @@
                         <h5 class="card-title">Envoyer un mail</h5>
                     </div>
                     <div class="card-body">
-                        <form action="#" method="POST">
+                        <form action="{{ url_for('mail.send_mail') }}" method="POST">
                             <div class="mb-3">
-                                <label for="recipient" class="form-label">Destinataire :</label>
-                                <input type="email" class="form-control" id="recipient" name="recipient" required>
+                                <label for="mail" class="form-label">Destinataire :</label>
+                                {% if mail %}
+                                    <input type="text" class="form-control" id="mail" name="mail" required value="{{ mail }}">
+                                {% else %}
+                                    <input type="text" class="form-control" id="mail" name="mail" required>
+                                {% endif %}
                             </div>
                             <div class="mb-3">
                                 <label for="subject" class="form-label">Sujet :</label>
@@ -21,6 +25,10 @@
                             <div class="mb-3">
                                 <label for="message" class="form-label">Message :</label>
                                 <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reason" class="form-label">Raison de l'envoi du mail :</label>
+                                <input type="text" class="form-control" id="reason" name="reason" required>
                             </div>
                             <button type="submit" class="btn btn-primary">Envoyer</button>
                         </form>
@@ -34,8 +42,10 @@
                     </div>
                     <div class="card-body">
                         {% include 'dataTable_templates_mail.html' %}
-                        <div class="text-end" data-bs-toggle="modal" data-bs-target="#addTemplateModal">
-                                <button class="btn btn-primary">Ajouter une template</button>
+                        <div class="text-end">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTemplateModal">
+                                Ajouter une template
+                            </button>
                         </div>
                     </div>
                 </div>

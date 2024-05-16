@@ -5,7 +5,7 @@ from app.lastSetPwd import bp
 from app.models.Account import Account
 
 
-@bp.route('/last_set', methods=['GET', 'POST'])
+@bp.route('/last-set', methods=['GET', 'POST'])
 def last_set():
     """
     Afficher la date de dernière modification du mot de passe
@@ -26,7 +26,7 @@ def last_set():
                 'Email': account['email'],
                 'Groupe': account['groupe'],
                 'Dernier changement de mot de passe': account['pwdChangedTime'],
-                'Jamais modifié' : account['NeverChanged'],
+                'Jamais modifié': account['NeverChanged'],
                 'locked': False,
             })
         else:
