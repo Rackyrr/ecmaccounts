@@ -1,3 +1,5 @@
+import secrets
+
 from flask import Flask
 from flask_migrate import Migrate
 
@@ -14,6 +16,7 @@ def create_app(config_class=Config):
     """
     app = Flask(__name__)
     app.config.from_object(config_class)
+    app.secret_key = secrets.token_hex()
 
     # Flask extensions
     db.init_app(app)

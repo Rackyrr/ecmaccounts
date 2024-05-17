@@ -1,3 +1,5 @@
+{% from "report_toaster.html" import toaster %}
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -48,9 +50,38 @@
   </nav>
 
   {% block content %}{% endblock %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <!-- Mini rapport des actions -->
+        <div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+            {% for category, data in messages %}
+                {% if category == 'message' %}
+                    {% for report_title, report_data in data.items() %}
+                        {% if report_data['accounts']|length > 0 %}
+                            {{ toaster(report_title, report_data['accounts'], report_data['color']) }}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+  {% endwith %}
 
     {% block scripts %}
     {% endblock %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+          const toastElList = document.querySelectorAll('.toast');
+          const toastList = [...toastElList].map(toastEl => new bootstrap.Toast(toastEl, {autohide: false}));
+          toastList.forEach(toast => toast.show());
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+            popoverTriggerList.forEach(function(popoverTriggerEl) {
+                new bootstrap.Popover(popoverTriggerEl);
+            });
+        });
+    </script>
 </body>
 </html>

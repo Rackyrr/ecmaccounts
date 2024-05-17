@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from flask import redirect, request, url_for, abort, render_template, current_app
+from flask import redirect, request, url_for, abort, render_template, current_app, flash
 from flask_mail import Message
 from jinja2 import Template
 
@@ -25,6 +25,14 @@ def delete():
     loginList = request.form['deleteListLogin']
     reason = request.form['reason']
     loginList = loginList.split(',')
+
+    # On créée une liste de mini-rapport pour chaque login
+    report = {'Comptes supprimés': {'accounts': [], 'color': 'danger'},
+              'Mail d\'avertissement envoyé': {'accounts': [], 'color': 'warning'},
+              'Comptes enregistrés comme à garder': {'accounts': [], 'color': 'info'},
+              'Délai du mail pas encore dépassé': {'accounts': [], 'color': 'success'},
+              'Comptes non existants': {'accounts': [], 'color': 'dark'}}
+
     ldap = Ldap()
     # On réalise les actions pour chaque login
     for login in loginList:
@@ -34,7 +42,7 @@ def delete():
             accountLdap = ldap.getUserByLogin(login)
             # Si le compte n'existe pas dans le ldap, erreur 404
             if accountLdap is None:
-                return abort(404, 'Login non existant, Suppression impossible. Login : ' + login)
+                report['Comptes non existants']['accounts'].append(login)
             # Si il existe, on le crée dans la bd
             else:
                 account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
@@ -43,9 +51,14 @@ def delete():
 
         storageTime = AccountStorageTime.query.filter_by(account_id=account.id).all()
         # On vérifie si le compte est à garder et surtout si le temps de conservation n'est pas dépassé
+        isToKeep = False
         for st in storageTime:
             if (st.until is not None) and (st.until > datetime.now()):
-                return abort(401, 'Le compte ' + login + ' ne peut pas être supprimé car il est conservé.')
+                report['Comptes enregistrés comme à garder']['accounts'].append(account.login)
+                isToKeep = True
+                continue
+        if isToKeep:
+            continue
 
         # On vérifie si un mail d'avertissement de suppression a été envoyé
         deletingMailHistory = History.query.filter_by(account_id=account.id, action_id=6).first()
@@ -65,12 +78,33 @@ def delete():
                     history = History(date_action=datetime.now(), account_id=account.id, action_id=2, reason=reason)
                     db.session.add(history)
                     db.session.commit()
+                    report['Comptes supprimés']['accounts'].append(account.login)
                 else:
                     # Si non, on ne supprime pas le compte
+                    report['Délai du mail pas encore dépassé']['accounts'].append(account.login)
                     continue
             else:
-                # Si il y a un mail d'annulation, on ne supprime pas le compte
-                continue
+                # Si il y a un mail d'annulation, on envoit un mail d'avertissement
+                accountLdap = ldap.getUserByLogin(login)
+                template = TemplateMail.query.filter_by(title_template="avertissement-supression").first()
+                msg = Message(template.subject,
+                              sender=current_app.config['MAIL_USERNAME'],
+                              recipients=[accountLdap['email']])
+                context = {
+                    'name': accountLdap['name'],
+                    'login': accountLdap['login'],
+                    'reason': reason
+                }
+                messageTemplate = Template(template.body)
+                result = messageTemplate.render(context)
+                msg.body = result
+                flaskMail.send(msg)
+                history = History(date_action=datetime.now(), account_id=account.id, action_id=6,
+                                  reason="Avertissement suppression: " + reason)
+                db.session.add(history)
+                account.pre_deleted = True
+                db.session.commit()
+                report['Mail d\'avertissement envoyé']['accounts'].append(account.login)
         else:
             # Si il n'y a pas de mail d'avertissement, on envoie un mail d'avertissement
             accountLdap = ldap.getUserByLogin(login)
@@ -96,6 +130,10 @@ def delete():
             db.session.add(history)
             account.pre_deleted = True
             db.session.commit()
+            report['Mail d\'avertissement envoyé']['accounts'].append(account.login)
+
+    # On envoie le mini-rapport dans un flash
+    flash(report)
 
     return redirect(request.referrer or url_for('main.index'))
 
@@ -110,13 +148,17 @@ def keep():
     reason = request.form['reason']
     until = request.form['until']
     loginList = loginList.split(',')
+
+    report = {'Comptes conservés': {'accounts': [], 'color': 'info'},
+              'Comptes non existants': {'accounts': [], 'color': 'dark'}}
     for login in loginList:
         account = Account.query.filter_by(login=login).first()
         if account is None:
             ldap = Ldap()
             accountLdap = ldap.getUserByLogin(login)
             if accountLdap is None:
-                return abort(404, 'Login non existant, Conservation impossible. Login : ' + login)
+                report['Comptes non existants']['accounts'].append(login)
+                continue
             else:
                 account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
                 db.session.add(account)
@@ -126,8 +168,11 @@ def keep():
         storage_time = AccountStorageTime(account_id=account.id, since=datetime.now(), until=until, reason=reason)
         db.session.add(storage_time)
         db.session.commit()
+        report['Comptes conservés']['accounts'].append(account.login)
 
-        return redirect(request.referrer or url_for('main.index'))
+    flash(report)
+
+    return redirect(request.referrer or url_for('main.index'))
 
 
 @bp.route('/lock', methods=['POST'])
@@ -139,13 +184,18 @@ def lock():
     loginlist = request.form['blockListLogin']
     reason = request.form['reason']
     loginlist = loginlist.split(',')
+
+    # Variable pour le mini-rapport
+    report = {'Comptes bloqués': {'accounts': [], 'color': 'info'},
+              'Comptes non existants': {'accounts': [], 'color': 'dark'}}
     for login in loginlist:
         account = Account.query.filter_by(login=login).first()
         if account is None:
             ldap = Ldap()
             accountLdap = ldap.getUserByLogin(login)
             if accountLdap is None:
-                return abort(404, 'Login non existant, Blocage impossible. Login : ' + login)
+                report['Comptes non existants']['accounts'].append(login)
+                continue
             else:
                 account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
                 db.session.add(account)
@@ -154,6 +204,11 @@ def lock():
         history = History(date_action=datetime.now(), account_id=account.id, action_id=4, reason=reason)
         db.session.add(history)
         db.session.commit()
+        # On ajoute le compte au mini-rapport
+        report['Comptes bloqués']['accounts'].append(account.login)
+
+    # On envoie le mini-rapport dans un flash
+    flash(report)
 
     return redirect(request.referrer or url_for('main.index'))
 
@@ -167,13 +222,18 @@ def unlock():
     loginlist = request.form['unblockListLogin']
     reason = request.form['reason']
     loginlist = loginlist.split(',')
+
+    # Variable pour le mini-rapport
+    report = {'Comptes débloqués': {'accounts': [], 'color': 'success'},
+              'Comptes non existants': {'accounts': [], 'color': 'dark'}}
     for login in loginlist:
         account = Account.query.filter_by(login=login).first()
         if account is None:
             ldap = Ldap()
             accountLdap = ldap.getUserByLogin(login)
             if accountLdap is None:
-                return abort(404, 'Login non existant, Déblocage impossible. Login : ' + login)
+                report['Comptes non existants']['accounts'].append(login)
+                continue
             else:
                 account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
                 db.session.add(account)
@@ -182,6 +242,10 @@ def unlock():
         history = History(date_action=datetime.now(), account_id=account.id, action_id=5, reason=reason)
         db.session.add(history)
         db.session.commit()
+        report['Comptes débloqués']['accounts'].append(account.login)
+
+    # On envoie le mini-rapport dans un flash
+    flash(report)
 
     return redirect(request.referrer or url_for('main.index'))
 
@@ -195,13 +259,17 @@ def cancel_delete():
     loginlist = request.form['cancelDeleteListLogin']
     reason = request.form['reason']
     loginlist = loginlist.split(',')
+
+    report = {'Annulation de la suppression': {'accounts': [], 'color': 'warning'},
+              'Comptes non existants': {'accounts': [], 'color': 'dark'}}
     for login in loginlist:
         account = Account.query.filter_by(login=login).first()
         if account is None:
             ldap = Ldap()
             accountLdap = ldap.getUserByLogin(login)
             if accountLdap is None:
-                return abort(404, 'Login non existant, Annulation suppression impossible. Login : ' + login)
+                report['Comptes non existants']['accounts'].append(login)
+                continue
             else:
                 account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
                 db.session.add(account)
@@ -210,6 +278,9 @@ def cancel_delete():
         history = History(date_action=datetime.now(), account_id=account.id, action_id=7, reason=reason)
         db.session.add(history)
         db.session.commit()
+        report['Annulation de la suppression']['accounts'].append(account.login)
+
+    flash(report)
 
     return redirect(request.referrer or url_for('main.index'))
 

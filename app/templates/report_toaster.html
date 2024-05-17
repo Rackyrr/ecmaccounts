@@ -1,0 +1,24 @@
+{% macro toaster(title, accounts, color) %}
+<div class="toast mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+        <div class="rounded me-2 bg-{{ color }}" style="width: 20px; height: 20px;"></div>
+        <strong class="me-auto">{{ title }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+        Nombre de comptes : {{ accounts|length }}
+        <div class="align-content-center">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom"
+                    data-bs-content="
+{% for account in accounts %}
+    {{ account }}
+    {% if loop.index < loop.length %}
+        ,
+    {% endif %}
+{% endfor %}">
+                Voir plus
+            </button>
+        </div>
+    </div>
+</div>
+{% endmacro %}

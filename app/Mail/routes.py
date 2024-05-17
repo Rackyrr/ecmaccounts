@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import render_template, request, current_app, redirect, url_for
+from flask import render_template, request, current_app, redirect, url_for, flash
 from jinja2 import Template
 from flask_mail import Message
 
@@ -44,6 +44,9 @@ def send_mail():
     subject = request.form['subject']
     message = request.form['message']
     reason = request.form['reason']
+
+    report = {'Mails envoyés': {'accounts': [], 'color': 'success'},
+              'Comptes non existants': {'accounts': [], 'color': 'dark'}}
     # On transforme le message en template jinja pour pouvoir remplacer les variables
     messageTemplate = Template(message)
     ldap = Ldap()
@@ -51,6 +54,9 @@ def send_mail():
     for email in listMail.split(','):
         email = email.strip()
         accountLdap = ldap.getUserByMail(email)
+        if accountLdap is None:
+            report['Comptes non existants']['accounts'].append(email)
+            continue
         # context contient les variables jinja et ce par quoi elles doivent être remplacées
         context = {
             'name': accountLdap['name'],
@@ -85,5 +91,8 @@ def send_mail():
         )
         db.session.add(history)
         db.session.commit()
+        report['Mails envoyés']['accounts'].append(email)
+
+    flash(report)
 
     return redirect(url_for('mail.writing'))

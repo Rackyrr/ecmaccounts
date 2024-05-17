@@ -21,7 +21,7 @@ def upgrade():
     op.create_table('template_mail',
     sa.Column('title_template', sa.String(length=64), nullable=False),
     sa.Column('subject', sa.String(length=64), nullable=True),
-    sa.Column('body', sa.String(length=64), nullable=True),
+    sa.Column('body', sa.String(length=250), nullable=True),
     sa.PrimaryKeyConstraint('title_template')
     )
     # ### end Alembic commands ###
