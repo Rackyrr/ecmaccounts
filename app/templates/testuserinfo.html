@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+<p>Salut <strong>{{ session.oidc_auth_profile.attributes.name }}</strong>, voilà tes infos de session OIDC :</p>
+<pre>
+{{ session.oidc_auth_profile | pprint }}
+</pre>
+<a class="btn btn-primary" href="/logout" role="button">Logout</a>
+{% endblock %}

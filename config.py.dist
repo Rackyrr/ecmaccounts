@@ -15,3 +15,20 @@ class Config(object):
     MAIL_PORT = 25
     MAIL_USE_TLS = False
     MAIL_USERNAME = 'mail@example.net'
+    OIDC_CLIENT_SECRETS = {
+        'web': {
+            'client_id': 'client_id_provided_by_auth_server',
+            'client_secret': 'client_secret_provided_by_auth_server',
+            'auth_uri': 'https://auth.example.net/oidc/oidcAuthorize',
+            'token_uri': 'https://auth.example.net/oidc/oidcAccessToken',
+            'userinfo_uri': 'https://auth.example.net/oidc/oidcProfile',
+            'issuer': 'https://auth.example.net/oidc',
+            'redirect_uris': [
+                'http://127.0.0.1:5000/oidc_callback',
+                # Mettre l'url de production
+            ]
+        }
+    }
+    OIDC_SCOPES = ['openid', 'email', 'profile']
+    # False pour connection locale et True pour connection avec le serveur d'authentification
+    OIDC_ENABLED = False

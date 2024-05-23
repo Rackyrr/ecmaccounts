@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 full-width">
+        <div class="row full-width">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Créer un nouvel utilisateur</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ url_for('user_gestion.add_user') }}" method="post">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Nom utilisateur (login) :</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="mail" class="form-label">Email :</label>
+                                <input type="text" class="form-control" id="mail" name="mail" required>
+                            </div>
+                            {% if oidc_enabled == False %}
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Mot de passe :</label>
+                                    <input class="form-control" id="password" name="password" >
+                                    <div class="alert alert-info mt-3" role="alert">
+                                        Ne pas mettre de mot de passe si l'utilisateur utilise l'authentification OIDC
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <button type="submit" class="btn btn-primary">Créer l'utilisateur</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Utilisateurs de l'application</h5>
+                    </div>
+                    <div class="card-body">
+                        {% include 'dataTable_users.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

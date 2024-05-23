@@ -1,0 +1,58 @@
+{% block styles %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}">
+{% endblock %}
+
+<!-- Affichez les données
+DataTable commence ici-->
+{% if donnees %}
+    <table id="myTable" class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th>Username</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in donnees %}
+                <tr>
+                    <th>{{ user}}</th>
+                    <th class="text-end">
+                        <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#Delete{{ user }}">
+                            <img src="{{ url_for('static', filename='svg/trash-fill.svg') }}" alt="trash">
+                        </button>
+                    </th>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <h3 class="heading-text text-center">Il n'y a pas encore de comptes utilisateurs</h3>
+{% endif %}
+<!-- DataTable termine ici-->
+
+{% for user in donnees %}
+    <!--Modal de suppression-->
+    <div class="modal fade" id="Delete{{ user }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Supprimer {{ user }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Êtes-vous sûr de vouloir supprimer {{ user }} ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <a href="{{ url_for('user_gestion.delete_user', username=user) }}" class="btn btn-danger">Supprimer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+{% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dataTable_template.js') }}"></script>
+{% endblock %}

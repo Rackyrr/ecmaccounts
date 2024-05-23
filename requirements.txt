@@ -7,3 +7,5 @@ Flask-Migrate
 Jinja2
 alembic
 Flask-Mail
+flask-oidc
+bcrypt

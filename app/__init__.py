@@ -3,7 +3,7 @@ import secrets
 from flask import Flask
 from flask_migrate import Migrate
 
-from app.extensions import db, flaskMail
+from app.extensions import db, flaskMail, oidc
 from config import Config
 from app.models import TemplateMail, Account, User, Action, AccountStorageTime, History
 
@@ -22,6 +22,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate = Migrate(app, db, compare_type=True)
     flaskMail.init_app(app)
+    oidc.init_app(app)
 
     # Blueprint registration
 
@@ -49,11 +50,24 @@ def create_app(config_class=Config):
     from app.lastSetPwd import bp as lastSetPwd_bp
     app.register_blueprint(lastSetPwd_bp, url_prefix='/password')
 
+    # Mail blueprint
     from app.Mail import bp as mail_bp
     app.register_blueprint(mail_bp, url_prefix='/mail')
 
+    # WaitingToDelete blueprint
     from app.waiting_to_delete import bp as waiting_to_delete_bp
     app.register_blueprint(waiting_to_delete_bp, url_prefix='/waiting-to-delete')
 
-    return app
+    # UserConnection blueprint
+    from app.user_gestion import bp as user_gestion_bp
+    app.register_blueprint(user_gestion_bp, url_prefix='/user_gestion')
 
+    # Auth blueprint
+    from app.auth import bp as auth_bp
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+
+    # CLI commands
+    from app.cli import init_app
+    init_app(app)
+
+    return app

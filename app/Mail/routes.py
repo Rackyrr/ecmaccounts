@@ -5,6 +5,7 @@ from jinja2 import Template
 from flask_mail import Message
 
 from app.Ldap import Ldap
+from app.auth.decorators import auth_required
 from app.models.TemplateMail import TemplateMail
 from app.Mail import bp
 from app import flaskMail, db
@@ -13,6 +14,7 @@ from app.models.Account import Account
 
 
 @bp.route('/write-mail', methods=['GET', 'POST'])
+@auth_required
 def writing():
     """
     Route permettant d'écrire un mail mais aussi de choisir un template et les gérer
@@ -34,6 +36,7 @@ def writing():
 
 
 @bp.route('/send-mail', methods=['POST'])
+@auth_required
 def send_mail():
     """
     Route pour envoyer un mail, récupère les données du formulaire et les envoies.

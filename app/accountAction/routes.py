@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from flask import redirect, request, url_for, abort, render_template, current_app, flash
+from flask import redirect, request, url_for, abort, render_template, current_app, flash, session
 from flask_mail import Message
 from jinja2 import Template
 
@@ -8,6 +8,7 @@ from app import db
 from app import flaskMail
 from app.Ldap import Ldap
 from app.accountAction import bp
+from app.auth.decorators import auth_required
 from app.models.Account import Account
 from app.models.AccountStorageTime import AccountStorageTime
 from app.models.History import History
@@ -16,6 +17,7 @@ from app.models.TemplateMail import TemplateMail
 
 
 @bp.route('/delete', methods=['POST'])
+@auth_required
 def delete():
     """
     Supprimer un ou plusieurs comptes utilisateurs.
@@ -75,7 +77,9 @@ def delete():
                 if datetime.now() - deletingMailHistory.date_action >= timedelta(days=60):
                     # Si oui, on supprime le compte
                     account.deleted = True
-                    history = History(date_action=datetime.now(), account_id=account.id, action_id=2, reason=reason)
+                    history = History(date_action=datetime.now(), account_id=account.id, action_id=2, reason=reason,
+                                      user_login=session['oidc_auth_profile']['sub'] if 'oidc_auth_profile' in session
+                                      else session['local_auth_profile'])
                     db.session.add(history)
                     db.session.commit()
                     report['Comptes supprimés']['accounts'].append(account.login)
@@ -100,7 +104,9 @@ def delete():
                 msg.body = result
                 flaskMail.send(msg)
                 history = History(date_action=datetime.now(), account_id=account.id, action_id=6,
-                                  reason="Avertissement suppression: " + reason)
+                                  reason="Avertissement suppression: " + reason,
+                                  user_login=session['oidc_auth_profile']['sub'] if 'oidc_auth_profile' in session
+                                  else session['local_auth_profile'])
                 db.session.add(history)
                 account.pre_deleted = True
                 db.session.commit()
@@ -126,7 +132,9 @@ def delete():
             flaskMail.send(msg)
             # On enregistre l'action dans l'historique
             history = History(date_action=datetime.now(), account_id=account.id, action_id=6,
-                              reason="Avertissement suppression: " + reason)
+                              reason="Avertissement suppression: " + reason,
+                              user_login=session['oidc_auth_profile']['sub'] if 'oidc_auth_profile' in session
+                              else session['local_auth_profile'])
             db.session.add(history)
             account.pre_deleted = True
             db.session.commit()
@@ -139,6 +147,7 @@ def delete():
 
 
 @bp.route('/keep', methods=['POST'])
+@auth_required
 def keep():
     """
     Garder un compte utilisateur.
@@ -163,7 +172,9 @@ def keep():
                 account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
                 db.session.add(account)
                 db.session.commit()
-        history = History(date_action=datetime.now(), account_id=account.id, action_id=3, reason=reason)
+        history = History(date_action=datetime.now(), account_id=account.id, action_id=3, reason=reason,
+                          user_login=session['oidc_auth_profile']['sub'] if 'oidc_auth_profile' in session
+                          else session['local_auth_profile'])
         db.session.add(history)
         storage_time = AccountStorageTime(account_id=account.id, since=datetime.now(), until=until, reason=reason)
         db.session.add(storage_time)
@@ -176,6 +187,7 @@ def keep():
 
 
 @bp.route('/lock', methods=['POST'])
+@auth_required
 def lock():
     """
     Bloquer un compte utilisateur.
@@ -201,7 +213,9 @@ def lock():
                 db.session.add(account)
                 db.session.commit()
         account.locked = True
-        history = History(date_action=datetime.now(), account_id=account.id, action_id=4, reason=reason)
+        history = History(date_action=datetime.now(), account_id=account.id, action_id=4, reason=reason,
+                          user_login=session['oidc_auth_profile']['sub'] if 'oidc_auth_profile' in session
+                          else session['local_auth_profile'])
         db.session.add(history)
         db.session.commit()
         # On ajoute le compte au mini-rapport
@@ -214,6 +228,7 @@ def lock():
 
 
 @bp.route('/unlock', methods=['POST'])
+@auth_required
 def unlock():
     """
     Débloquer un compte utilisateur.
@@ -239,7 +254,9 @@ def unlock():
                 db.session.add(account)
                 db.session.commit()
         account.locked = False
-        history = History(date_action=datetime.now(), account_id=account.id, action_id=5, reason=reason)
+        history = History(date_action=datetime.now(), account_id=account.id, action_id=5, reason=reason,
+                          user_login=session['oidc_auth_profile']['sub'] if 'oidc_auth_profile' in session
+                          else session['local_auth_profile'])
         db.session.add(history)
         db.session.commit()
         report['Comptes débloqués']['accounts'].append(account.login)
@@ -251,6 +268,7 @@ def unlock():
 
 
 @bp.route('/cancel-delete', methods=['POST'])
+@auth_required
 def cancel_delete():
     """
     Annuler la suppression d'un compte utilisateur.
@@ -275,7 +293,9 @@ def cancel_delete():
                 db.session.add(account)
                 db.session.commit()
         account.pre_deleted = False
-        history = History(date_action=datetime.now(), account_id=account.id, action_id=7, reason=reason)
+        history = History(date_action=datetime.now(), account_id=account.id, action_id=7, reason=reason,
+                          user_login=session['oidc_auth_profile']['sub'] if 'oidc_auth_profile' in session
+                          else session['local_auth_profile'])
         db.session.add(history)
         db.session.commit()
         report['Annulation de la suppression']['accounts'].append(account.login)
@@ -286,6 +306,7 @@ def cancel_delete():
 
 
 @bp.route('<string:login>/details')
+@auth_required
 def details(login):
     """
     Afficher les détails d'un compte utilisateur.
@@ -307,6 +328,7 @@ def details(login):
     for h in history:
         historyReadModel.append({'Date': h.date_action,
                                  'Action': Action.query.filter_by(action_id=h.action_id).first().label,
-                                 'Raison': h.reason})
+                                 'Raison': h.reason,
+                                 'Utilisateur responsable': h.user_login})
     return render_template('accountDetails.html', user=accountLdap, donnees=historyReadModel,
                            locked=account.locked, deleted=account.deleted)

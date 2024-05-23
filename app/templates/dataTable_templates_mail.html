@@ -1,5 +1,5 @@
 {% block styles %}
-        <link rel="stylesheet" href="{{ url_for('static', filename='datatables.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}">
 {% endblock %}
 
 <!-- Affichez les données
@@ -18,10 +18,10 @@ DataTable commence ici-->
                     <th>{{ row['Nom template'] }}</th>
                     <th class="text-end">
                         <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#Edit{{ row['Nom template'] }}">
-                            <img src="{{ url_for('static', filename='pencil-square.svg') }}" alt="edit">
+                            <img src="{{ url_for('static', filename='svg/pencil-square.svg') }}" alt="edit">
                         </button>
                         <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#Delete{{ row['Nom template'] }}">
-                            <img src="{{ url_for('static', filename='trash-fill.svg') }}" alt="trash">
+                            <img src="{{ url_for('static', filename='svg/trash-fill.svg') }}" alt="trash">
                         </button>
                         <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#Use{{ row['Nom template'] }}">
                             Utiliser
@@ -117,6 +117,6 @@ DataTable commence ici-->
 
 {% block scripts %}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{{ url_for('static', filename='datatables.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='dataTable_template.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dataTable_template.js') }}"></script>
 {% endblock %}

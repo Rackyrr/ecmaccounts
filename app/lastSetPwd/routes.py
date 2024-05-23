@@ -1,11 +1,13 @@
 from flask import request, current_app, render_template
 
 from app.Ldap import Ldap
+from app.auth.decorators import auth_required
 from app.lastSetPwd import bp
 from app.models.Account import Account
 
 
 @bp.route('/last-set', methods=['GET', 'POST'])
+@auth_required
 def last_set():
     """
     Afficher la date de dernière modification du mot de passe

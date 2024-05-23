@@ -2,10 +2,12 @@ from flask import request, redirect, url_for
 
 from app import db
 from app.Mail.templateAction import bp
+from app.auth.decorators import auth_required
 from app.models.TemplateMail import TemplateMail
 
 
 @bp.route('/create', methods=['POST'])
+@auth_required
 def create():
     if request.method != 'POST':
         return 'Method not allowed', 405
@@ -21,6 +23,7 @@ def create():
 
 
 @bp.route('/delete/<string:templateName>', methods=['GET'])
+@auth_required
 def deleteTemp(templateName):
     if request.method != 'GET':
         return 'Method not allowed', 405
@@ -33,6 +36,7 @@ def deleteTemp(templateName):
 
 
 @bp.route('/update', methods=['POST'])
+@auth_required
 def update():
     if request.method != 'POST':
         return 'Method not allowed', 405

@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Gestion des Comptes{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block styles %}
     {% endblock %}
 </head>
@@ -42,10 +42,36 @@
                 <a class="nav-link" href="{{ url_for('waiting_to_delete.user_waiting_to_delete') }}">Comptes en pré-suppression</a>
             </li>
         </ul>
+          <div class="d-flex ms-auto">
+              <a class="btn btn-outline-primary me-2" href="{{ url_for('mail.writing') }}">
+                <img src="{{ url_for('static', filename='svg/envelope.svg') }}" alt="Iconne envelope">
+              </a>
+              <div class="dropdown">
+                  <a class="btn btn-outline-primary dropdown-toggle" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                      <img src="{{ url_for('static', filename='svg/person-square.svg') }}" alt="Iconne utilisateur">
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                      <li><a class="dropdown-item" href="{{ url_for('user_gestion.user_gestion') }}">Gérer les utilisateurs</a></li>
+                      {% if session.oidc_auth_profile %}
+                            <li><a class="dropdown-item" href="{{ url_for('oidc_auth.logout') }}">Déconnexion</a></li>
+                      {% else %}
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Déconnexion</a></li>
+                      {% endif %}
+
+                      <li><hr class="dropdown-divider"></li>
+                      <li>
+                          <div class="dropdown-item">
+                              {% if session.oidc_auth_profile %}
+                                  Connecté en tant que : <strong>{{ session.oidc_auth_profile.id }}</strong>
+                              {% else %}
+                                  Connecté en tant que : <strong>{{ session.local_auth_profile }}</strong>
+                              {% endif %}
+                          </div>
+                      </li>
+                  </ul>
+              </div>
+          </div>
       </div>
-        <a class="btn btn-outline-primary" href="{{ url_for('mail.writing') }}">
-            <img src="{{ url_for('static', filename='envelope.svg') }}" alt="Iconne envelope">
-        </a>
     </div>
   </nav>
 
@@ -55,7 +81,7 @@
         <!-- Mini rapport des actions -->
         <div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
             {% for category, data in messages %}
-                {% if category == 'message' %}
+                {% if category == 'message' and data is mapping %}
                     {% for report_title, report_data in data.items() %}
                         {% if report_data['accounts']|length > 0 %}
                             {{ toaster(report_title, report_data['accounts'], report_data['color']) }}

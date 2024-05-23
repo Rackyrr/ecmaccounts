@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import render_template
 
 from app import db
+from app.auth.decorators import auth_required
 from app.userToKeep import bp
 from app.models.Account import Account
 from app.models.AccountStorageTime import AccountStorageTime
@@ -10,6 +11,7 @@ from app.Ldap import Ldap
 
 
 @bp.route('/')
+@auth_required
 def userToKeep():
     """
     Afficher les utilisateurs à conserver dans un tableau avec les temps de conservations.

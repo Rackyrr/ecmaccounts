@@ -1,5 +1,5 @@
 {% block styles %}
-        <link rel="stylesheet" href="{{ url_for('static', filename='datatables.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}">
 {% endblock %}
 
 <!-- Affichez les données
@@ -30,6 +30,6 @@ DataTable commence ici-->
 
 {% block scripts %}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{{ url_for('static', filename='datatables.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='dataTable_history.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dataTable_history.js') }}"></script>
 {% endblock %}

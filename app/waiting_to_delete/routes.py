@@ -1,6 +1,7 @@
 from flask import render_template
 
 from app.Ldap import Ldap
+from app.auth.decorators import auth_required
 from app.models.Account import Account
 from app.models.History import History
 from app.models.Action import Action
@@ -10,6 +11,7 @@ from app import db
 
 
 @bp.route('/user-waiting-to_delete')
+@auth_required
 def user_waiting_to_delete():
     """
     Route permettant d'afficher les utilisateurs en attente de suppression

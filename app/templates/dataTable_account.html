@@ -1,16 +1,5 @@
-<!-- Faire les import css et js dans le fichier qui include le tableau
-Import css :
-<link rel="stylesheet" href="{{ url_for('static', filename='datatables.min.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-Import js :
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="{{ url_for('static', filename='datatables.min.js') }}"></script>
-<script src="{{ url_for('static', filename='dataTable_user.js') }}"></script>
--->
-
 {% block styles %}
-        <link rel="stylesheet" href="{{ url_for('static', filename='datatables.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}">
 {% endblock %}
 
 <!-- Affichez les données
@@ -54,11 +43,11 @@ DataTable commence ici-->
                         <td class="text-center">
                             {% if row['locked'] == False %}
                                 <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#lock{{ row['Login'] }}">
-                                    <img src="{{ url_for('static', filename='unlock-fill.svg') }}" alt="Icon cadena ouvert">
+                                    <img src="{{ url_for('static', filename='svg/unlock-fill.svg') }}" alt="Icon cadena ouvert">
                                 </button>
                             {% else %}
                                 <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#unlock{{ row['Login'] }}">
-                                    <img src="{{ url_for('static', filename='lock-fill.svg') }}" alt="Icon cadena fermé">
+                                    <img src="{{ url_for('static', filename='svg/lock-fill.svg') }}" alt="Icon cadena fermé">
                                 </button>
                             {% endif %}
                         </td>
@@ -66,7 +55,7 @@ DataTable commence ici-->
                     {% if lookOption == True %}
                         <td class="text-center">
                             <a href="{{ url_for('accountAction.details', login=row['Login']) }}" class="btn btn-outline-primary btn-sm disable">
-                                <img src="{{ url_for('static', filename='search.svg') }}" alt="Icone loupe">
+                                <img src="{{ url_for('static', filename='svg/search.svg') }}" alt="Icone loupe">
                             </a>
                         </td>
                     {% endif %}
@@ -254,6 +243,6 @@ DataTable commence ici-->
 
 {% block scripts %}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{{ url_for('static', filename='datatables.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='dataTable_user.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dataTable_user.js') }}"></script>
 {% endblock %}

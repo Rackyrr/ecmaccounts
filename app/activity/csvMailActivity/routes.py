@@ -6,11 +6,13 @@ from flask import render_template, request, current_app, redirect, url_for
 from werkzeug.utils import secure_filename
 
 from app.activity.csvMailActivity import bp
+from app.auth.decorators import auth_required
 from app.models.Account import Account
 from app.Ldap import Ldap
 
 
 @bp.route('/upload')
+@auth_required
 def upload():
     """
     Afficher le modèle d'import CSV.
@@ -20,6 +22,7 @@ def upload():
 
 
 @bp.route('/user_mail', methods=['GET', 'POST'])
+@auth_required
 def mailActivity():
     """
     Importer un fichier CSV contenant les données d'activité des utilisateurs et les traiter.
@@ -83,6 +86,7 @@ def mailActivity():
 
 
 @bp.route('/test')
+@auth_required
 def test():
     ldap = Ldap()
     return ldap.seeUserExample()
