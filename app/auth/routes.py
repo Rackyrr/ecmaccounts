@@ -19,7 +19,7 @@ def login_local():
     password = request.form['password']
     next_url = request.form['next']
     user = User.query.filter_by(username=username).first()
-    if user is None or not user.check_password(password):
+    if user is None or not user.check_password(password) or user.password is None or user.password == '':
         return redirect(url_for('auth.login_form', incorrect=True, next=next_url))
     else:
         session['local_auth_profile'] = username
