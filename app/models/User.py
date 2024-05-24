@@ -1,4 +1,4 @@
-import bcrypt
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from app.extensions import db
 
@@ -13,7 +13,7 @@ class User(db.Model):
         return '<User {}>'.format(self.login)
 
     def set_password(self, password):
-        self.password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        self.password = generate_password_hash(password)
 
     def check_password(self, password_given):
-        return bcrypt.checkpw(password_given.encode('utf-8'), self.password.encode('utf-8'))
+        return check_password_hash(self.password_hash, password_given)

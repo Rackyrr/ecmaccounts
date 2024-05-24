@@ -242,7 +242,7 @@ DataTable commence ici-->
 </form>
 
 {% block scripts %}
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/jquery-3.7.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/dataTable_user.js') }}"></script>
 {% endblock %}
