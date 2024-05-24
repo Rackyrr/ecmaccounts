@@ -15,9 +15,12 @@ DataTable commence ici-->
         <tbody>
             {% for user in donnees %}
                 <tr>
-                    <th>{{ user}}</th>
+                    <th>{{ user['username'] }}</th>
                     <th class="text-end">
-                        <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#Delete{{ user }}">
+                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#Edit{{ user['username'] }}">
+                            <img src="{{ url_for('static', filename='svg/pencil-square.svg') }}" alt="edit">
+                        </button>
+                        <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#Delete{{ user['username'] }}">
                             <img src="{{ url_for('static', filename='svg/trash-fill.svg') }}" alt="trash">
                         </button>
                     </th>
@@ -32,23 +35,66 @@ DataTable commence ici-->
 
 {% for user in donnees %}
     <!--Modal de suppression-->
-    <div class="modal fade" id="Delete{{ user }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="Delete{{ user['username'] }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Supprimer {{ user }}</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Supprimer {{ user['username'] }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Êtes-vous sûr de vouloir supprimer {{ user }} ?
+                    Êtes-vous sûr de vouloir supprimer {{ user['username'] }} ?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <a href="{{ url_for('user_gestion.delete_user', username=user) }}" class="btn btn-danger">Supprimer</a>
+                    <a href="{{ url_for('user_gestion.delete_user', username=user['username']) }}" class="btn btn-danger">Supprimer</a>
                 </div>
             </div>
         </div>
     </div>
+
+    <!--Modal de modification-->
+    <div class="modal fade" id="Edit{{ user['username'] }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modifier {{ user['username'] }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm{{ user['username'] }}" action="{{ url_for('user_gestion.edit_user', username=user['username']) }}" method="POST">
+                        <div class="mb-3">
+                            <label for="mail" class="form-label">Mail</label>
+                            <input type="text" class="form-control" id="mail" name="mail" value="{{ user['mail'] }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password{{ user['username'] }}" class="form-label">Nouveau mot de passe</label>
+                            <input type="password" class="form-control" id="password{{ user['username'] }}" name="password">
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword{{ user['username'] }}" class="form-label">Confirmer mot de passe</label>
+                            <input type="password" class="form-control" id="confirmPassword{{ user['username'] }}" name="confirmPassword">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Modifier</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let formId = "editUserForm{{ user['username'] }}";
+            let form = document.getElementById(formId);
+            form.addEventListener("submit", function(event) {
+                let password = document.getElementById("password{{ user['username'] }}").value;
+                let confirmPassword = document.getElementById("confirmPassword{{ user['username'] }}").value;
+                if (password !== confirmPassword) {
+                    alert("Les mots de passe ne correspondent pas.");
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
 {% endfor %}
 
 {% block scripts %}

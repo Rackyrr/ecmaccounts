@@ -12,7 +12,7 @@ def user_gestion():
     userList = User.query.all()
     usersReadModel = []
     for user in userList:
-        usersReadModel.append(user.username)
+        usersReadModel.append({'username': user.username, 'mail': user.email})
     return render_template('new_user_form.html', donnees=usersReadModel,
                            oidc_enabled=current_app.config['OIDC_ENABLED'])
 
@@ -49,5 +49,27 @@ def delete_user(username):
     db.session.commit()
 
     flash({'Suppression d\'un compte utilisateur': {'accounts': [username], 'color': 'danger'}})
+
+    return redirect(request.referrer or url_for('main.index'))
+
+
+@bp.route('/edit_user/<string:username>', methods=['POST'])
+@auth_required
+def edit_user(username):
+    if request.method != 'POST':
+        return 'Method not allowed', 405
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        return 'User not found', 404
+    user.email = request.form['mail'] if request.form['mail'] else user.email
+    password = request.form['password']
+    if password is not None and password != '':
+        password_confirm = request.form['confirmPassword']
+        if password != password_confirm or password_confirm == '' or password_confirm is None:
+            return 'Passwords do not match', 400
+        user.set_password(password)
+    db.session.commit()
+
+    flash({'Modification d\'un compte utilisateur': {'accounts': [username], 'color': 'info'}})
 
     return redirect(request.referrer or url_for('main.index'))
