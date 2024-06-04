@@ -32,3 +32,4 @@ class Config(object):
     OIDC_SCOPES = ['openid', 'email', 'profile']
     # False pour connection locale et True pour connection avec le serveur d'authentification
     OIDC_ENABLED = False
+    ELASTICSEARCH_URL = 'http://elastic.example.net:9200'
