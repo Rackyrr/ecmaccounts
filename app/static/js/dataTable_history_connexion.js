@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    let table = new DataTable('#templateTable', {
+    let table = new DataTable('#connexionsTable', {
         //Selection des lignes possibles
         select: true,
         responsive: true,
@@ -17,13 +17,7 @@ $(document).ready(function() {
                 cells: "",
             }
         },
+        //Organisation visuelle du tableau
+        dom: "Qfrtip", //Affiche seulement la recherche avancée avec la congifuration par défaut
     });
-
-    function use_template(title, newSubject, newMessage) {
-        let subject = document.getElementById('subject');
-        let message = document.getElementById('message');
-        subject.value = newSubject;
-        message.value = newMessage;
-        $('#Use' + title).modal('hide');
-    }
 });

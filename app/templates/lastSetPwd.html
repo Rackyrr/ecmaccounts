@@ -9,15 +9,12 @@
                     Filtrer
                 </div>
                 <div class="card-body">
-                    <form action="{{ url_for('lastSetPwd.last_set') }}" method="POST">
                         <div class="form-group">
                             <div class="card-title">
                                 <label for="password_expiration">Durée de non modification du mot de passe (en jours)</label>
                             </div>
                             <input type="number" class="form-control" id="password_expiration" name="password_expiration" value="{{ password_expiration }}">
-                            <button type="submit" class="btn btn-primary mt-1">Filtrer</button>
                         </div>
-                    </form>
                 </div>
             </div>
         </div>

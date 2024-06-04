@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+<body>
+{% block content %}
+    <div class="container mt-3 full-width">
+        <div class="row mt-1">
+            <div class="col-md-12">
+                <!-- Résultat du CSV -->
+                <div class="card w-100">
+                    <div class="card-header">
+                        Dernière connexion des comptes (application)
+                    </div>
+                    <div class="card-body scrollable-body">
+                        {% include 'dataTable_account.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+</body>

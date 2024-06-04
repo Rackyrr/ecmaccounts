@@ -1,3 +1,6 @@
+from flask import current_app
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from app.extensions import db
 
 
@@ -11,3 +14,25 @@ class Account(db.Model):
 
     def __repr__(self):
         return '<Account {}>'.format(self.login)
+
+    @hybrid_property
+    def all_activity_elastic_search(self):
+        activities = current_app.elasticsearch.search(index='filebeat-*', query={
+            "match": {
+                "username": self.login
+            }
+        }, size=1000)
+        if activities['hits']['total']['value'] == 0:
+            return None
+        return activities['hits']['hits']
+
+    @hybrid_property
+    def last_activity_elastic_search(self):
+        activities = current_app.elasticsearch.search(index='filebeat-*', query={
+            "match": {
+                "username": self.login
+            }
+        }, size=1, sort='@timestamp:desc')
+        if activities['hits']['total']['value'] == 0:
+            return None
+        return activities['hits']['hits'][0]

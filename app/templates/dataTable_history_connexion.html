@@ -4,17 +4,17 @@
 
 <!-- Affichez les données
 DataTable commence ici-->
-{% if donnees %}
-    <table id="actionsTable" class="table">
+{% if connections %}
+    <table id="connexionsTable" class="table w-100">
         <thead class="thead-dark">
             <tr>
-                {% for key in donnees[0].keys() %}
+                {% for key in connections[0].keys() %}
                     <th>{{ key }}</th>
                 {% endfor %}
             </tr>
         </thead>
         <tbody>
-            {% for row in donnees %}
+            {% for row in connections %}
                 <tr>
                     {% for value in row.values() %}
                         <td>{{ value }}</td>
@@ -24,12 +24,12 @@ DataTable commence ici-->
         </tbody>
     </table>
 {% else %}
-    <h2 class="heading-text text-center">Il n'y a pas actions dans l'historique du compte</h2>
+    <h2 class="heading-text text-center">Il n'y a pas de connexions dans l'historique du compte</h2>
 {% endif %}
 <!-- DataTable termine ici-->
 
 {% block scripts %}
     <script src="{{ url_for('static', filename='js/jquery-3.7.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/dataTable_history.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dataTable_history_connexion.js') }}"></script>
 {% endblock %}

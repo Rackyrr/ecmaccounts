@@ -4,120 +4,44 @@
 
 <!-- Affichez les données
 DataTable commence ici-->
-{% if donnees %}
-    <table id="myTable" class="table">
-        <thead class="thead-dark">
-            <tr>
+<table id="accountTable" class="table">
+    <thead class="thead-dark">
+        <tr>
+            {% if csvPage == True %}
                 {% for key in donnees[0].keys() %}
-                    {% if 'locked' in donnees[0] %}
-                        {% if loop.index < loop.length %}
-                            <th>{{ key }}</th>
-                        {% endif %}
-                    {% else %}
-                        <th>{{ key }}</th>
-                    {% endif %}
+                    <th>{{ key }}</th>
                 {% endfor %}
-                {% if 'locked' in donnees[0] %}
-                    <th>Bloquer/Débloquer</th>
-                {% endif %}
-                {% if lookOption == True %}
-                    <th>Plus de détails</th>
-                {% endif %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in donnees %}
-                <tr>
-                    {% for value in row.values() %}
-                        {% if 'locked' in row %}
-                            {% if loop.index < loop.length %}
-                                <td>{{ value }}</td>
-                            {% endif %}
-                        {% else %}
-                            <td>{{ value }}</td>
-                        {% endif %}
-                    {% endfor %}
-                    <!-- Ligne pour afficher les bouttons bloquer/débloquer.
-                    Ne s'affiche que si dans la liste de dict il y a la clé 'locked'-->
-                    {% if 'locked' in row %}
-                        <td class="text-center">
-                            {% if row['locked'] == False %}
-                                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#lock{{ row['Login'] }}">
-                                    <img src="{{ url_for('static', filename='svg/unlock-fill.svg') }}" alt="Icon cadena ouvert">
-                                </button>
-                            {% else %}
-                                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#unlock{{ row['Login'] }}">
-                                    <img src="{{ url_for('static', filename='svg/lock-fill.svg') }}" alt="Icon cadena fermé">
-                                </button>
-                            {% endif %}
-                        </td>
-                    {% endif %}
-                    {% if lookOption == True %}
-                        <td class="text-center">
-                            <a href="{{ url_for('accountAction.details', login=row['Login']) }}" class="btn btn-outline-primary btn-sm disable">
-                                <img src="{{ url_for('static', filename='svg/search.svg') }}" alt="Icone loupe">
-                            </a>
-                        </td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <!-- DataTable termine ici-->
-
-    <!-- Modal pour bloquer/débloquer un utilisateur -->
-    {% if 'locked' in donnees[0] %}
-        {% for row in donnees %}
-            {% if row['locked'] == False %}
-                <div class="modal fade" id="lock{{ row['Login'] }}" tabindex="-1" aria-labelledby="lock{{ row['Login'] }}" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Bloquer l'utilisateur {{ row['Login'] }}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form action="{{ url_for('accountAction.lock') }}" method="post">
-                                    <input type="hidden" name="blockListLogin" value="{{ row['Login'] }}">
-                                    <label for="reason" class="form-label">Raison du blocage</label>
-                                    <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                        <input type="submit" class="btn btn-danger" value="Bloquer"/>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-                <div class="modal fade" id="unlock{{ row['Login'] }}" tabindex="-1" aria-labelledby="unlock{{ row['Login'] }}" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Débloquer l'utilisateur {{ row['Login'] }}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form action="{{ url_for('accountAction.unlock') }}" method="post">
-                                    <input type="hidden" name="unblockListLogin" value="{{ row['Login'] }}">
-                                    <label for="reason" class="form-label">Raison du déblocage</label>
-                                    <input type="text" class="form-control" name="reason" id="reason" placeholder="Raison">
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                        <input type="submit" class="btn btn-danger" value="Débloquer"/>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <th>Plus de détails</th>
             {% endif %}
+            {% for column in columnNames %}
+                <th>{{ column }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+{% if csvPage == True %}
+    <tbody>
+        {% for row in donnees %}
+            <tr>
+                {% for value in row.values() %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
         {% endfor %}
-    {% endif %}
-{% else %}
-    <h3 class="heading-text text-center">Il n'y a pas encore d'utilisateurs pour cette table</h3>
+    </tbody>
 {% endif %}
+    <tfoot>
+        <tr>
+            {% for column in columnNames %}
+                {% if column == '' or column == 'Plus de détails' %}
+                    <th class="d-none">{{ column }}</th>
+                {% else %}
+                    <th>{{ column }}</th>
+                {% endif %}
+            {% endfor %}
+        </tr>
+    </tfoot>
+</table>
+    <!-- DataTable termine ici-->
 
 <!-- Modal pour la suppression d'un utilisateur -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -242,7 +166,8 @@ DataTable commence ici-->
 </form>
 
 {% block scripts %}
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script src="{{ url_for('static', filename='js/jquery-3.7.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/dataTable_user.js') }}"></script>
+    <script src="{{ urlJS }}"></script>
 {% endblock %}

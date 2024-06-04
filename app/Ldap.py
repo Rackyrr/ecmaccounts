@@ -62,10 +62,11 @@ class Ldap:
                         groupe = groupe[0]
                 else:
                     groupe = 'Non renseigné'
-                AccountsMail[entry['attributes']['uid'][0]] = {'email': email,
-                                                               'groupe': groupe,
-                                                               'uidNumber': uidNumber,
-                                                               'name': entry['attributes']['displayName']}
+                AccountsMail[entry['attributes']['uid'][0]] = {
+                    'email': email,
+                    'groupe': groupe,
+                    'uidNumber': uidNumber,
+                    'name': entry['attributes']['displayName']}
             return AccountsMail
 
     def getUserByLogin(self, login):
@@ -176,5 +177,5 @@ class Ldap:
                                          'pwdChangedTime': pwdChangedTime, 'NeverChanged': False})
                 else:
                     Accounts.append({'login': entry['attributes']['uid'][0], 'email': email, 'groupe': groupe,
-                                     'pwdChangedTime': '', 'NeverChanged': True})
+                                     'pwdChangedTime': datetime.min, 'NeverChanged': True})
             return Accounts

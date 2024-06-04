@@ -77,7 +77,7 @@ def delete():
                 if datetime.now() - deletingMailHistory.date_action >= timedelta(days=60):
                     # Si oui, on supprime le compte
                     account.deleted = True
-                    history = History(date_action=datetime.now(), account_id=account.id, action_id=2, reason=reason,
+                    history = History(date_action=datetime.now().replace(microsecond=0), account_id=account.id, action_id=2, reason=reason,
                                       user_login=session['oidc_auth_profile']['sub'] if 'oidc_auth_profile' in session
                                       else session['local_auth_profile'])
                     db.session.add(history)
@@ -103,7 +103,7 @@ def delete():
                 result = messageTemplate.render(context)
                 msg.body = result
                 flaskMail.send(msg)
-                history = History(date_action=datetime.now(), account_id=account.id, action_id=6,
+                history = History(date_action=datetime.now().replace(microsecond=0), account_id=account.id, action_id=6,
                                   reason="Avertissement suppression: " + reason,
                                   user_login=session['oidc_auth_profile']['sub'] if 'oidc_auth_profile' in session
                                   else session['local_auth_profile'])
@@ -131,7 +131,7 @@ def delete():
             # On envoie le mail
             flaskMail.send(msg)
             # On enregistre l'action dans l'historique
-            history = History(date_action=datetime.now(), account_id=account.id, action_id=6,
+            history = History(date_action=datetime.now().replace(microsecond=0), account_id=account.id, action_id=6,
                               reason="Avertissement suppression: " + reason,
                               user_login=session['oidc_auth_profile']['sub'] if 'oidc_auth_profile' in session
                               else session['local_auth_profile'])
@@ -172,11 +172,13 @@ def keep():
                 account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
                 db.session.add(account)
                 db.session.commit()
-        history = History(date_action=datetime.now(), account_id=account.id, action_id=3, reason=reason,
+        history = History(date_action=datetime.now().replace(microsecond=0), account_id=account.id, action_id=3,
+                          reason=reason,
                           user_login=session['oidc_auth_profile']['sub'] if 'oidc_auth_profile' in session
                           else session['local_auth_profile'])
         db.session.add(history)
-        storage_time = AccountStorageTime(account_id=account.id, since=datetime.now(), until=until, reason=reason)
+        storage_time = AccountStorageTime(account_id=account.id, since=datetime.now().replace(microsecond=0),
+                                          until=until, reason=reason)
         db.session.add(storage_time)
         db.session.commit()
         report['Comptes conservés']['accounts'].append(account.login)
@@ -213,7 +215,8 @@ def lock():
                 db.session.add(account)
                 db.session.commit()
         account.locked = True
-        history = History(date_action=datetime.now(), account_id=account.id, action_id=4, reason=reason,
+        history = History(date_action=datetime.now().replace(microsecond=0), account_id=account.id, action_id=4,
+                          reason=reason,
                           user_login=session['oidc_auth_profile']['sub'] if 'oidc_auth_profile' in session
                           else session['local_auth_profile'])
         db.session.add(history)
@@ -254,7 +257,8 @@ def unlock():
                 db.session.add(account)
                 db.session.commit()
         account.locked = False
-        history = History(date_action=datetime.now(), account_id=account.id, action_id=5, reason=reason,
+        history = History(date_action=datetime.now().replace(microsecond=0), account_id=account.id, action_id=5,
+                          reason=reason,
                           user_login=session['oidc_auth_profile']['sub'] if 'oidc_auth_profile' in session
                           else session['local_auth_profile'])
         db.session.add(history)
@@ -293,7 +297,8 @@ def cancel_delete():
                 db.session.add(account)
                 db.session.commit()
         account.pre_deleted = False
-        history = History(date_action=datetime.now(), account_id=account.id, action_id=7, reason=reason,
+        history = History(date_action=datetime.now().replace(microsecond=0), account_id=account.id, action_id=7,
+                          reason=reason,
                           user_login=session['oidc_auth_profile']['sub'] if 'oidc_auth_profile' in session
                           else session['local_auth_profile'])
         db.session.add(history)
@@ -323,6 +328,7 @@ def details(login):
             account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
             db.session.add(account)
             db.session.commit()
+    # Traitement de l'historique des actions sur le compte
     history = History.query.filter_by(account_id=account.id).all()
     historyReadModel = []
     for h in history:
@@ -330,5 +336,30 @@ def details(login):
                                  'Action': Action.query.filter_by(action_id=h.action_id).first().label,
                                  'Raison': h.reason,
                                  'Utilisateur responsable': h.user_login})
+
+    # Traitement des données de connexion elasticsearch
+    ConnectionReadModel = []
+    connections = account.all_activity_elastic_search
+    if connections is not None:
+        for connection in connections:
+            if 'cas' in connection['_source']:
+                # Convertir le timestamp en datetime :
+                dateConnexion = datetime.strptime(connection['_source']['@timestamp'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                dateConnexion = dateConnexion.replace(microsecond=0)
+                ConnectionReadModel.append({
+                    'Type de connexion': 'CAS',
+                    'Date': dateConnexion,
+                    'Adresse IP': connection['_source']['cas']['clientIpAddress'],
+                    'Service': connection['_source']['cas']['dict_data']['service']
+                    if 'dict_data' in connection['_source']['cas'] else 'Non renseigné'})
+            elif 'maillog' in connection['_source']:
+                dateConnexion = datetime.strptime(connection['_source']['@timestamp'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                dateConnexion = dateConnexion.replace(microsecond=0)
+                ConnectionReadModel.append({
+                    'Type de connexion': 'Mail',
+                    'Date': dateConnexion,
+                    'Adresse IP': connection['_source']['maillog']['clientip'],
+                    'Service': 'Mail'})
+
     return render_template('accountDetails.html', user=accountLdap, donnees=historyReadModel,
-                           locked=account.locked, deleted=account.deleted)
+                           locked=account.locked, deleted=account.deleted, connections=ConnectionReadModel)

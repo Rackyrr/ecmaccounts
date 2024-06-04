@@ -2,8 +2,9 @@ import secrets
 
 from flask import Flask
 from flask_migrate import Migrate
+from elasticsearch import Elasticsearch
 
-from app.extensions import db, flaskMail, oidc
+from app.extensions import db, flaskMail, oidc, init_es
 from config import Config
 from app.models import TemplateMail, Account, User, Action, AccountStorageTime, History
 
@@ -24,6 +25,9 @@ def create_app(config_class=Config):
     flaskMail.init_app(app)
     oidc.init_app(app)
 
+    # Elasticsearch
+    app.elasticsearch = init_es(app)
+
     # Blueprint registration
 
     # Main blueprint
@@ -35,8 +39,8 @@ def create_app(config_class=Config):
     app.register_blueprint(activity_bp, url_prefix='/activity')
 
     # UserToKeep blueprint
-    from app.userToKeep import bp as userToKeep_bp
-    app.register_blueprint(userToKeep_bp, url_prefix='/keep-user')
+    from app.accountsToKeep import bp as userToKeep_bp
+    app.register_blueprint(userToKeep_bp, url_prefix='/keep-accounts')
 
     # AccountAction blueprint
     from app.accountAction import bp as accountAction_bp

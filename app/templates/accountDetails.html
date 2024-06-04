@@ -57,14 +57,32 @@
         </div>
         <div class="row mt-1">
             <div class="col-md-12">
-                <!-- Résultat du CSV
-                Card Bootstrap-->
                 <div class="card w-100">
                     <div class="card-header">
-                        Historique des actions sur le compte
+                        <ul id="myTab" class="nav nav-tabs" role="tablist">
+                            <li class="nav-item flex-fill" role="presentation">
+                                <button id="actions-tab" class="nav-link active w-100" data-bs-toggle="tab" data-bs-target="#actions"
+                                        type="button" role="tab" aria-controls="actions" aria-selected="true">
+                                    Historique des actions sur le compte
+                                </button>
+                            </li>
+                            <li class="nav-item flex-fill" role="presentation">
+                                <button id="connections-tab" class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#connections"
+                                        type="button" role="tab" aria-controls="connections" aria-selected="false">
+                                    Historique des connexions du compte
+                                </button>
+                            </li>
+                        </ul>
                     </div>
                     <div class="card-body">
-                        {% include 'dataTable_history.html' %}
+                        <div id="Content-tab" class="tab-content">
+                            <div id="actions" class="tab-pane fade show active" role="tabpanel" aria-labelledby="actions-tab">
+                                {% include 'dataTable_history.html' %}
+                            </div>
+                            <div id="connections" class="tab-pane fade" role="tabpanel" aria-labelledby="connections-tab">
+                                {% include 'dataTable_history_connexion.html' %}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -165,5 +183,4 @@
             </div>
         </div>
     </div>
-
 {% endblock %}

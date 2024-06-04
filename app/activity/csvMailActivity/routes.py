@@ -79,7 +79,10 @@ def mailActivity():
 
         # Rendre le modèle avec les données traitées pour affichage
         return render_template('mailActivityCSV.html', donnees=donnees,
-                               filename=secure_filename(file.filename), lookOption=True)
+                               filename=secure_filename(file.filename),
+                               urlJS=url_for('static',
+                                             filename='js/datatables_account/dataTable_csv_activity_mail.js'),
+                               csvPage=True)
 
     # Si la méthode de la requête n'est pas POST, afficher le modèle d'import CSV
     return redirect(url_for('activity.csvMailActivity.upload'))

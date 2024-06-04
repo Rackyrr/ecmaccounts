@@ -5,7 +5,7 @@
 <!-- Affichez les données
 DataTable commence ici-->
 {% if donnees %}
-    <table id="myTable" class="table">
+    <table id="userTable" class="table">
         <thead class="thead-dark">
             <tr>
                 <th>Username</th>
@@ -100,5 +100,5 @@ DataTable commence ici-->
 {% block scripts %}
     <script src="{{ url_for('static', filename='js/jquery-3.7.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/dataTable_template.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dataTable_user.js') }}"></script>
 {% endblock %}

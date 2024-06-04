@@ -29,14 +29,14 @@
                 </a>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="{{ url_for('activity.csvMailActivity.upload') }}">Mail (CSV)</a></li>
-                  <li><a class="dropdown-item disabled" href="#">Application</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('activity.lastAppActivity.last_activity') }}">Application</a></li>
                 </ul>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('lastSetPwd.last_set') }}">Mot de passe</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('userToKeep.userToKeep') }}">Comptes à garder</a>
+                <a class="nav-link" href="{{ url_for('accountsToKeep.accountsToKeep') }}">Comptes à garder</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('waiting_to_delete.user_waiting_to_delete') }}">Comptes en pré-suppression</a>
