@@ -40,32 +40,32 @@ def get_accounts():
 
     # Filtre Login
     search_login = request.args.get('columns[0][search][value]', '')
-    if search_login and request.args.get('columns[0][searchable]', '') == 'true':
+    if search_login and request.args.get('columns[0][searchable]', '') == 'true' and search_login != '':
         filtered_accounts = {login: account for login, account in filtered_accounts.items()
                              if search_login in login}
 
     # Filtre Email
     search_email = request.args.get('columns[1][search][value]', '')
-    if search_email and request.args.get('columns[1][searchable]', '') == 'true':
+    if search_email and request.args.get('columns[1][searchable]', '') == 'true' and search_email != '':
         filtered_accounts = {login: account for login, account in filtered_accounts.items()
                              if search_email in account['email']}
 
     # Filtre Groupe
     search_groupe = request.args.get('columns[2][search][value]', '')
-    if search_groupe and request.args.get('columns[2][searchable]', '') == 'true':
+    if search_groupe and request.args.get('columns[2][searchable]', '') == 'true' and search_groupe != '':
         filtered_accounts = {login: account for login, account in filtered_accounts.items()
                              if search_groupe in account['groupe']}
 
     # Filtre Supprimé
     search_deleted = request.args.get('columns[3][search][value]', '')
-    if search_deleted and request.args.get('columns[3][searchable]', '') == 'true':
+    if search_deleted and request.args.get('columns[3][searchable]', '') == 'true' and search_deleted != '':
         filtered_accounts = {login: account for login, account in filtered_accounts.items()
                              if search_deleted in (str(Account.query.filter_by(login=login).first().deleted).lower()
                                                    if Account.query.filter_by(login=login).first() else 'false')}
 
     # Filtre locked
     search_locked = request.args.get('columns[4][search][value]', '')
-    if search_locked and request.args.get('columns[4][searchable]', '') == 'true':
+    if search_locked and request.args.get('columns[4][searchable]', '') == 'true' and search_locked != '':
         filtered_accounts = {login: account for login, account in filtered_accounts.items()
                              if search_locked in (str(Account.query.filter_by(login=login).first().locked).lower()
                                                   if Account.query.filter_by(login=login).first() else 'false')}

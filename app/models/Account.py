@@ -6,11 +6,14 @@ from app.extensions import db
 
 class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    uid = db.Column(db.Integer, index=True, unique=True)
     login = db.Column(db.String(64), index=True, unique=True)
     pre_deleted = db.Column(db.Boolean, default=False, nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
     locked = db.Column(db.Boolean, default=False, nullable=False)
+    last_connection_date = db.Column(db.DateTime, nullable=True)
+    last_connection_ip = db.Column(db.String(128), nullable=True)
+    last_connection_type = db.Column(db.String(64), nullable=True)
+    last_connection_service = db.Column(db.String(128), nullable=True)
 
     def __repr__(self):
         return '<Account {}>'.format(self.login)

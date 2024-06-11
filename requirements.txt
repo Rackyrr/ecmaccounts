@@ -9,3 +9,4 @@ alembic
 Flask-Mail
 flask-oidc
 elasticsearch
+flask-apscheduler

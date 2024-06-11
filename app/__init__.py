@@ -2,9 +2,8 @@ import secrets
 
 from flask import Flask
 from flask_migrate import Migrate
-from elasticsearch import Elasticsearch
 
-from app.extensions import db, flaskMail, oidc, init_es
+from app.extensions import db, flaskMail, oidc, scheduler, init_es
 from config import Config
 from app.models import TemplateMail, Account, User, Action, AccountStorageTime, History
 
@@ -24,12 +23,13 @@ def create_app(config_class=Config):
     migrate = Migrate(app, db, compare_type=True)
     flaskMail.init_app(app)
     oidc.init_app(app)
+    scheduler.init_app(app)
+    scheduler.start()
 
     # Elasticsearch
     app.elasticsearch = init_es(app)
 
     # Blueprint registration
-
     # Main blueprint
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
@@ -70,8 +70,15 @@ def create_app(config_class=Config):
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
+    # LockedAccounts blueprint
+    from app.locked_accounts import bp as locked_accounts_bp
+    app.register_blueprint(locked_accounts_bp, url_prefix='/locked-accounts')
+
     # CLI commands
     from app.cli import init_app
     init_app(app)
+
+    # Import tasks to register them with the scheduler
+    from app import tasks
 
     return app

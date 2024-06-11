@@ -18,12 +18,12 @@ $(document).ready(function() {
             }
         },
     });
-
-    function use_template(title, newSubject, newMessage) {
-        let subject = document.getElementById('subject');
-        let message = document.getElementById('message');
-        subject.value = newSubject;
-        message.value = newMessage;
-        $('#Use' + title).modal('hide');
-    }
 });
+
+function use_template(title, newSubject, newMessage) {
+    let subject = document.getElementById('subject');
+    let message = document.getElementById('message');
+    subject.value = newSubject;
+    message.value = newMessage;
+    $('#Use' + title).modal('hide');
+}
