@@ -10,7 +10,7 @@ def sync_accounts(app):
     Sync accounts from LDAP to the database every 15 minutes
     """
     with app.app_context():
-        print("Synchronizing accounts")
+        app.logger.info("Synchronizing accounts")
         ldap = Ldap()
 
         allAccounts = ldap.getAllUsersBasicInfo()
@@ -20,8 +20,8 @@ def sync_accounts(app):
                 new_account = Account(login=login)
                 db.session.add(new_account)
                 db.session.commit()
-                print(f"Account {login} created in the database")
-        print("Syncronization done")
+                app.logger.info(f"Account {login} created in the database")
+        app.logger.info("Syncronization done")
 
 
 def last_connection(app):
@@ -29,7 +29,7 @@ def last_connection(app):
     Update last connection for each account every hour
     """
     with app.app_context():
-        print("Updating last connection :")
+        app.logger.info("Updating last connection :")
         allAccounts = Account.query.all()
 
         for account in allAccounts:
@@ -49,7 +49,7 @@ def last_connection(app):
                         account.last_connection_ip = user_last_connection['_source']['maillog']['clientip']
                         account.last_connection_service = 'Mail'
                     db.session.commit()
-                    print(f"Last connection updated for account {account.login}")
+                    app.logger.info(f"Last connection updated for account {account.login}")
             else:
                 if account.last_connection_date is None:
                     account.last_connection_date = datetime.min
@@ -57,5 +57,5 @@ def last_connection(app):
                     account.last_connection_ip = 'Non renseigné'
                     account.last_connection_service = 'Non renseigné'
                     db.session.commit()
-                    print(f"Default connexion for {account.login}")
-        print("Last connection of all accounts updated")
+                    app.logger.info(f"Default connexion for {account.login}")
+        app.logger.info("Last connection of all accounts updated")

@@ -33,4 +33,3 @@ class Config(object):
     # False pour connection locale et True pour connection avec le serveur d'authentification
     OIDC_ENABLED = False
     ELASTICSEARCH_URL = 'http://elastic.example.net:9200'
-    SCHEDULER_API_ENABLED = True # Pour activer le scheduler qui permet de planifier les tâches

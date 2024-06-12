@@ -9,5 +9,3 @@ alembic
 Flask-Mail
 flask-oidc
 elasticsearch
-flask-apscheduler
-APScheduler==4.0.0a5
