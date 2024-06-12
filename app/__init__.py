@@ -1,9 +1,11 @@
 import secrets
 
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.interval import IntervalTrigger
 from flask import Flask
 from flask_migrate import Migrate
 
-from app.extensions import db, flaskMail, oidc, init_es
+from app.extensions import db, flaskMail, oidc, scheduler, init_es
 from config import Config
 from app.models import TemplateMail, Account, User, Action, AccountStorageTime, History
 
@@ -23,6 +25,7 @@ def create_app(config_class=Config):
     migrate = Migrate(app, db, compare_type=True)
     flaskMail.init_app(app)
     oidc.init_app(app)
+    scheduler.start_in_background()
 
     # Elasticsearch
     app.elasticsearch = init_es(app)
@@ -71,6 +74,13 @@ def create_app(config_class=Config):
     # LockedAccounts blueprint
     from app.locked_accounts import bp as locked_accounts_bp
     app.register_blueprint(locked_accounts_bp, url_prefix='/locked-accounts')
+
+    # Scheduled tasks
+    from app.tasks.scheduled_tasks import sync_accounts, last_connection
+    scheduler.add_schedule(sync_accounts, CronTrigger.from_crontab("*/15 * * * *"), id='sync_accounts',
+                           kwargs={'app': app})
+    scheduler.add_schedule(last_connection, CronTrigger.from_crontab("0 */1 * * *"), id='last_connection',
+                           kwargs={'app': app})
 
     # CLI commands
     from app.cli import init_app

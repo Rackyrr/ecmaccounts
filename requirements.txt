@@ -10,4 +10,4 @@ Flask-Mail
 flask-oidc
 elasticsearch
 flask-apscheduler
-APScheduler
+APScheduler==4.0.0a5
