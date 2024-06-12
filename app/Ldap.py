@@ -179,3 +179,22 @@ class Ldap:
                     Accounts.append({'login': entry['attributes']['uid'][0], 'email': email, 'groupe': groupe,
                                      'pwdChangedTime': datetime.min, 'NeverChanged': True})
             return Accounts
+
+    def getLastSetPwdByLogin(self, login):
+        """
+        Recuperer le dernier changement de mot de passe d'un utilisateur
+        :param login:
+        :return: Dernier changement de mot de passe
+        """
+        with self.connection as conn:
+            conn.search(current_app.config['LDAP_SEARCH_BASE'], '(&(objectclass=supannPerson)(uid=' + login + '))',
+                        attributes=['sambaPwdLastSet'],
+                        search_scope='SUBTREE')
+            if len(conn.response) == 0:
+                return 'Compte inexistant'
+            pwdChangedTime = conn.response[0]['attributes'].get('sambaPwdLastSet', '')
+            if pwdChangedTime:
+                pwdChangedTime = datetime.fromtimestamp(pwdChangedTime)
+            else:
+                pwdChangedTime = datetime.min
+            return pwdChangedTime

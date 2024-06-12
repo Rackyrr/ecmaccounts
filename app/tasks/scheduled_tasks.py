@@ -1,18 +1,16 @@
 from datetime import datetime
 
-from app.extensions import scheduler
 from app.extensions import db
 from app.Ldap import Ldap
 from app.models.Account import Account
 
 
-@scheduler.task('cron', id='sync-accounts', minute='*/15')
-def sync_accounts():
+def sync_accounts(app):
     """
     Sync accounts from LDAP to the database every 15 minutes
     """
-    with scheduler.app.app_context():
-        print("Syncing accounts :")
+    with app.app_context():
+        print("Synchronizing accounts")
         ldap = Ldap()
 
         allAccounts = ldap.getAllUsersBasicInfo()
@@ -23,15 +21,14 @@ def sync_accounts():
                 db.session.add(new_account)
                 db.session.commit()
                 print(f"Account {login} created in the database")
-        print("Sync done")
+        print("Syncronization done")
 
 
-@scheduler.task('cron', id='last-connection', hour='*')
-def last_connection():
+def last_connection(app):
     """
     Update last connection for each account every hour
     """
-    with (scheduler.app.app_context()):
+    with app.app_context():
         print("Updating last connection :")
         allAccounts = Account.query.all()
 
@@ -62,4 +59,3 @@ def last_connection():
                     db.session.commit()
                     print(f"Default connexion for {account.login}")
         print("Last connection of all accounts updated")
-

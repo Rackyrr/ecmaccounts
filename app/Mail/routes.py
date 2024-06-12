@@ -63,6 +63,7 @@ def send_mail():
         # context contient les variables jinja et ce par quoi elles doivent être remplacées
         context = {
             'name': accountLdap['name'],
+            'lastSetPwd': str(ldap.getLastSetPwdByLogin(accountLdap['login'])),
         }
         # On remplace les variables jinja par les données
         result = messageTemplate.render(context)

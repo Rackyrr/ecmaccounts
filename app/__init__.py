@@ -3,7 +3,7 @@ import secrets
 from flask import Flask
 from flask_migrate import Migrate
 
-from app.extensions import db, flaskMail, oidc, scheduler, init_es
+from app.extensions import db, flaskMail, oidc, init_es
 from config import Config
 from app.models import TemplateMail, Account, User, Action, AccountStorageTime, History
 
@@ -23,8 +23,6 @@ def create_app(config_class=Config):
     migrate = Migrate(app, db, compare_type=True)
     flaskMail.init_app(app)
     oidc.init_app(app)
-    scheduler.init_app(app)
-    scheduler.start()
 
     # Elasticsearch
     app.elasticsearch = init_es(app)
@@ -77,8 +75,5 @@ def create_app(config_class=Config):
     # CLI commands
     from app.cli import init_app
     init_app(app)
-
-    # Import tasks to register them with the scheduler
-    from app import tasks
 
     return app

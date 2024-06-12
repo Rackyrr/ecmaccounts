@@ -86,10 +86,3 @@ def mailActivity():
 
     # Si la méthode de la requête n'est pas POST, afficher le modèle d'import CSV
     return redirect(url_for('activity.csvMailActivity.upload'))
-
-
-@bp.route('/test')
-@auth_required
-def test():
-    ldap = Ldap()
-    return ldap.seeUserExample()

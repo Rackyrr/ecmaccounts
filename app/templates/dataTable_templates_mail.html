@@ -78,6 +78,13 @@ DataTable commence ici-->
                         <div class="mb-3">
                             <label for="message_update" class="form-label">Message</label>
                             <textarea class="form-control" id="message_update" name="message_update" rows="3">{{ row['Message'] }}</textarea>
+                            <div class="alert alert-info mt-2" role="alert">
+                                <strong>Les variables suivantes peuvent être insérées entre double accolades :</strong>
+                                <ul>
+                                    <li><code class="variable">name</code> : nom du destinataire</li>
+                                    <li><code class="variable">lastSetPwd</code> : date de dernier changement de mot de passe</li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
