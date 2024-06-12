@@ -22,7 +22,7 @@ $(document).ready(function() {
             {
                 data: null,
                 render: function(data, type, row) {
-                    return '<a href="../account/%login/details" class="btn btn-outline-primary btn-sm disable">'
+                    return '<a href="../../account/%login/details" class="btn btn-outline-primary btn-sm disable">'
                         .replace('%login', row['Login']) +
                         '<img src="../../static/svg/search.svg" alt="Icone loupe"> </a>';
                 },

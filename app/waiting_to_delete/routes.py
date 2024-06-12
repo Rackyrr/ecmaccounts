@@ -30,6 +30,7 @@ def get_users_waiting_to_delete():
     Point de terminaison API pour le traitement côté serveur de DataTables pour les utilisateurs en
     attente de suppression.
     """
+    # Requête pour récupérer les utilisateurs en attente de suppression
     query = (
         db.session.query(
             Account.login,

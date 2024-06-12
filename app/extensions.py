@@ -3,11 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
 from flask_oidc import OpenIDConnect
 
+# Initialize extensions
 db = SQLAlchemy()
 flaskMail = Mail()
 oidc = OpenIDConnect()
 
 
+# Initialize Elasticsearch
 def init_es(app):
     """
     Initialize Elasticsearch
