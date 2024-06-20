@@ -355,11 +355,15 @@ def details(login):
             elif 'maillog' in connection['_source']:
                 dateConnexion = datetime.strptime(connection['_source']['@timestamp'], "%Y-%m-%dT%H:%M:%S.%fZ")
                 dateConnexion = dateConnexion.replace(microsecond=0)
+                if 'application' in connection['_source'] and connection['_source']['application'] != '':
+                    application = connection['_source']['application']
+                else
+                    application = 'Mail'
                 ConnectionReadModel.append({
                     'Type de connexion': 'Mail',
                     'Date': dateConnexion,
                     'Adresse IP': connection['_source']['maillog']['clientip'],
-                    'Service': 'Mail'})
+                    'Service': application})
 
     return render_template('accountDetails.html', user=accountLdap, donnees=historyReadModel,
                            locked=account.locked, deleted=account.deleted, connections=ConnectionReadModel)
