@@ -357,7 +357,7 @@ def details(login):
                 dateConnexion = dateConnexion.replace(microsecond=0)
                 if 'application' in connection['_source'] and connection['_source']['application'] != '':
                     application = connection['_source']['application']
-                else
+                else:
                     application = 'Mail'
                 ConnectionReadModel.append({
                     'Type de connexion': 'Mail',
