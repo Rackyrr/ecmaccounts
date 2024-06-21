@@ -47,7 +47,7 @@ def delete():
                 report['Comptes non existants']['accounts'].append(login)
             # Si il existe, on le crée dans la bd
             else:
-                account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
+                account = Account(login=accountLdap['login'])
                 db.session.add(account)
                 db.session.commit()
 
@@ -169,7 +169,7 @@ def keep():
                 report['Comptes non existants']['accounts'].append(login)
                 continue
             else:
-                account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
+                account = Account(login=accountLdap['login'])
                 db.session.add(account)
                 db.session.commit()
         history = History(date_action=datetime.now().replace(microsecond=0), account_id=account.id, action_id=3,
@@ -211,7 +211,7 @@ def lock():
                 report['Comptes non existants']['accounts'].append(login)
                 continue
             else:
-                account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
+                account = Account(login=accountLdap['login'])
                 db.session.add(account)
                 db.session.commit()
         account.locked = True
@@ -253,7 +253,7 @@ def unlock():
                 report['Comptes non existants']['accounts'].append(login)
                 continue
             else:
-                account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
+                account = Account(login=accountLdap['login'])
                 db.session.add(account)
                 db.session.commit()
         account.locked = False
@@ -293,7 +293,7 @@ def cancel_delete():
                 report['Comptes non existants']['accounts'].append(login)
                 continue
             else:
-                account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
+                account = Account(login=accountLdap['login'])
                 db.session.add(account)
                 db.session.commit()
         account.pre_deleted = False
@@ -325,7 +325,7 @@ def details(login):
         if accountLdap is None:
             return abort(404, 'Login non existant, Détails impossible. Login : ' + login)
         else:
-            account = Account(login=accountLdap['login'], uid=accountLdap['uidNumber'])
+            account = Account(login=accountLdap['login'])
             db.session.add(account)
             db.session.commit()
     # Traitement de l'historique des actions sur le compte
