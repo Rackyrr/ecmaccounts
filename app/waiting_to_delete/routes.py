@@ -53,7 +53,7 @@ def get_users_waiting_to_delete():
 
         accountsList.append({
             "Login": account.login,
-            "Email": account_ldap['email'],
+            "Email": account_ldap['email'] if account_ldap is not None else 'Non renseigné',
             "Raison": account.reason,
             "Date de l'avertissement": account.date_action,
             'locked': accountDB.locked if accountDB is not None else False
