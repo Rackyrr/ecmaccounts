@@ -46,9 +46,10 @@ def get_users_waiting_to_delete():
     results = db.session.execute(query).fetchall()
     ldap = Ldap()
     accountsList = []
+    ldap_accounts = ldap.getAllUsersBasicInfo()
 
     for account in results:
-        account_ldap = ldap.getUserByLogin(account.login)
+        account_ldap = ldap_accounts[account.login] if account.login in ldap_accounts else None
         accountDB = Account.query.filter_by(login=account.login).first()
 
         accountsList.append({
