@@ -30,7 +30,12 @@ def get_last_set_pwd():
     Point de terminaison API pour le traitement côté serveur de DataTables.
     :return: Reponse JSON
     """
-    days = int(request.args.get('password_expiration', current_app.config['DEFAULT_PWD_LAST_SET']))
+    try:
+        days = int(request.args.get('password_expiration', current_app.config['DEFAULT_PWD_LAST_SET']))
+    except ValueError:
+        return jsonify({
+            'error': 'Valeur incorrecte spécifiée pour le nombre de jours'
+        })
     ldap = Ldap()
     accounts = ldap.getUsersWithPwdLastSetOver(days)
     accountsReadModel = []
