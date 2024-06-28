@@ -23,7 +23,7 @@
         <div class="col-md-12">
             <div class="card w-100">
                 <div class="card-header">
-                    Comptes avec le mot de passe non modifié depuis plus de {{ password_expiration }} jours
+                    Comptes avec le mot de passe non modifié depuis plus de <span id="pwdage">{{ password_expiration }}</span> jours
                 </div>
                 <div class="card-body">
                     {% include 'dataTable_account.html' %}
@@ -32,4 +32,9 @@
         </div>
     </div>
 </div>
+<script>
+    $("#password_expiration").on("change", function() {
+        $("#pwdage").text($(this).val());
+      } );
+</script>
 {% endblock %}
